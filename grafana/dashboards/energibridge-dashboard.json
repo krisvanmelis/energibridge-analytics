@@ -1,0 +1,59 @@
+{
+    "id": null,
+    "uid": "cLV5GDCkz",
+    "title": "Energibridge Dashboard",
+    "tags": [],
+    "timezone": "browser",
+    "editable": true,
+    "graphTooltip": 1,
+    "panels": [
+      {
+        "type": "graph",
+        "title": "Sample Data Graph",
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 24,
+          "h": 9
+        },
+        "datasource": "PostgreSQL",
+        "targets": [
+          {
+            "refId": "A",
+            "rawSql": "SELECT timestamp AS time, value FROM test_data ORDER BY time",
+            "format": "time_series"
+          }
+        ],
+        "xaxis": {
+          "mode": "time",
+          "show": true
+        },
+        "yaxes": [
+          {
+            "format": "short",
+            "show": true
+          },
+          {
+            "show": true
+          }
+        ]
+      }
+    ],
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": []
+    },
+    "templating": {
+      "list": []
+    },
+    "annotations": {
+      "list": []
+    },
+    "refresh": "5s",
+    "schemaVersion": 17,
+    "version": 0,
+    "links": []
+  }

@@ -1,0 +1,21 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+*.tmp
+
+# Docker files
+docker-compose.override.yml
+docker-compose.*.yml
+
+# Local project volumes
+volumes/
+
+# OS generated files
+.DS_Store
+Thumbs.db
