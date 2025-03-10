@@ -16,6 +16,9 @@ docker-compose.*.yml
 # Local project volumes
 volumes/
 
+# CSV data folder
+csv-data/
+
 # OS generated files
 .DS_Store
 Thumbs.db

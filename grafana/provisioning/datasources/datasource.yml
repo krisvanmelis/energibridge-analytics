@@ -17,3 +17,10 @@ datasources:
       maxIdleConns: 100
       connMaxLifetime: 14400
       minInterval: 1m
+
+  - name: CSV
+    type: yesoreyeram-infinity-datasource
+    access: proxy
+    jsonData:
+      type: 'csv'
+      url: 'http://nginx:80/csv-data'

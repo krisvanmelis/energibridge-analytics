@@ -1,59 +1,162 @@
 {
-    "id": null,
-    "uid": "cLV5GDCkz",
-    "title": "Energibridge Dashboard",
-    "tags": [],
-    "timezone": "browser",
-    "editable": true,
-    "graphTooltip": 1,
-    "panels": [
+  "annotations": {
+    "list": [
       {
-        "type": "graph",
-        "title": "Sample Data Graph",
-        "gridPos": {
-          "x": 0,
-          "y": 0,
-          "w": 24,
-          "h": 9
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
         },
-        "datasource": "PostgreSQL",
-        "targets": [
-          {
-            "refId": "A",
-            "rawSql": "SELECT timestamp AS time, value FROM test_data ORDER BY time",
-            "format": "time_series"
-          }
-        ],
-        "xaxis": {
-          "mode": "time",
-          "show": true
-        },
-        "yaxes": [
-          {
-            "format": "short",
-            "show": true
-          },
-          {
-            "show": true
-          }
-        ]
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
       }
-    ],
-    "time": {
-      "from": "now-6h",
-      "to": "now"
-    },
-    "timepicker": {
-      "refresh_intervals": []
-    },
-    "templating": {
-      "list": []
-    },
-    "annotations": {
-      "list": []
-    },
-    "refresh": "5s",
-    "schemaVersion": 17,
-    "version": 0,
-    "links": []
-  }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 2,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "PEB6B42F54C42D283"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "points",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "Time",
+              "text": "Time",
+              "type": "timestamp_epoch"
+            },
+            {
+              "selector": "CPU_ENERGY (J)",
+              "text": "CPU_ENERGY (J)",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "PEB6B42F54C42D283"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "url": "http://nginx/csv-data/large_specific_extensions_0.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "CPU ENERGY",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "5s",
+  "schemaVersion": 40,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2025-02-25T23:07:27.503Z",
+    "to": "2025-02-25T23:07:58.558Z"
+  },
+  "timepicker": {
+    "refresh_intervals": []
+  },
+  "timezone": "browser",
+  "title": "Energibridge Dashboard",
+  "uid": "cLV5GDCkz",
+  "version": 1,
+  "weekStart": ""
+}

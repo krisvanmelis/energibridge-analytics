@@ -1,7 +1,7 @@
 # Energibridge Analytics
 
 ## Overview
-This project sets up a PostgreSQL database and Grafana for analytics purposes using Docker Compose.
+This project sets up a PostgreSQL database and Grafana for analytics purposes using Docker Compose. Additionally, it includes an Nginx service to host CSV files for Grafana's Infinity datasource.
 
 ## Prerequisites
 - Docker
@@ -33,6 +33,9 @@ This project sets up a PostgreSQL database and Grafana for analytics purposes us
 
 ## Provisioning
 Grafana is pre-configured with a PostgreSQL datasource and a default dashboard called "Energibridge Dashboard". The provisioning files are located in the `grafana/provisioning` directory. The dashboard JSON file is located in the `grafana/dashboards` directory.
+
+## CSV Files
+CSV files placed in the `csv-data` directory are hosted by the Nginx service at `http://localhost:8080/csv-data`. These files can be accessed by Grafana's Infinity datasource.
 
 ## Stopping the services
 To stop the services, run:
