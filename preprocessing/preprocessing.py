@@ -8,15 +8,13 @@ from pprint import pprint
 
 # Preprocessing file/module
 
-# TODO: check other cpu fields to see if necessary
-
 
 def preprocess(csv: pd.DataFrame) -> pd.DataFrame:
     """
     Takes imported csv as DataFrame and do necessary preprocessing. This includes finding differences in energy and
     adding converted where necessary. Adds missing power or energy columns where necessary.
-    :param csv: loaded csv as a DataFrame
-    :return: preprocessed DataFrame
+    :param csv: Loaded csv as a DataFrame
+    :return: Preprocessed DataFrame
     """
     # Go through all dataframe columns and preprocess where necessary
     res = csv.copy()
@@ -27,7 +25,7 @@ def preprocess(csv: pd.DataFrame) -> pd.DataFrame:
         if re.search(r'_ENERGY \(J\)$', column):
             # Call the energy_preprocessing function on res and the column
             res = energy_preprocessing(res, column)
-        elif re.search(r'_POWER \(W\)$', column):
+        elif re.search(r'_POWER \(Watts\)$', column):
             # Call the power_preprocessing function on res and the column
             res = power_preprocessing(res, column)
         else:
@@ -39,18 +37,13 @@ def preprocess(csv: pd.DataFrame) -> pd.DataFrame:
 def energy_preprocessing(df: pd.DataFrame, column: str) -> pd.DataFrame:
     """
     Preprocess energy data and add power column. Will find delta if energy metric is cumulative
-    :param df: Pandas DataFrame with columns ['Time', 'Delta', r'*_ENERGY (J)']
-    :param column: column name to preprocess
-    :return: Pandas DataFrame with the added things
+    :param df: Pandas DataFrame with columns ['Time', 'Delta', r'*_ENERGY (J)'].
+    :param column: Name of column to preprocess.
+    :return: Pandas DataFrame with the added power column and delta column.
     """
     ndf = df.copy()
 
-    # TODO: check if cumulative and find deltas if it is
-    cumulative = True
-    if cumulative:
-        ndf[f'DIFF_{column}'] = ndf[column].diff().fillna(0)
-    else:
-        ndf[f'DIFF_{column}'] = ndf[column]
+    ndf[f'DIFF_{column}'] = ndf[column].diff().fillna(0)
 
     # Add power column
     cat = column.split('_')[0]
@@ -62,9 +55,9 @@ def energy_preprocessing(df: pd.DataFrame, column: str) -> pd.DataFrame:
 def power_preprocessing(df: pd.DataFrame, column: str) -> pd.DataFrame:
     """
     Preprocessing for power columns. Adds energy column.
-    :param df:
-    :param column:
-    :return:
+    :param df: Pandas DataFrame with columns ['Time', 'Delta'] and the column to preprocess
+    :param column: Name of the column to preprocess
+    :return: Copy of the DataFrame with the added energy column.
     """
     ndf = df.copy()
     # Add energy column
@@ -76,25 +69,15 @@ def power_preprocessing(df: pd.DataFrame, column: str) -> pd.DataFrame:
 
 # Loading and saving / main?
 
-input_folder = '../csv-data/input'  # TODO: change
-files = ['large_specific_extensions_0.csv']  # TODO: max!!
-output_folder = '../csv-data/preprocessing_output'  # TODO: change
-# input is lijst van bestandnamen + folder_path
 
-# laat errors throwen die in front-end gebruikt kunnen worden
-# Errors: I/O (opening enz)
-# Geen error is succes
-# Return lijst niewe bestandnamen en nieuwe folder_path
-# Mss issue:
-
-
-def load_data_and_preprocess(input_folder: str, files: list, output_folder: str):
+def load_data_and_preprocess(input_folder: str, files: list, output_folder: str) -> [str]:
     """
-    TODO: docstring
-    :param input_folder:
-    :param files:
-    :param output_folder:
-    :return:
+    Loads the specified csvs and calls the preprocess function on them. Saves the preprocessed files in the output
+    folder and returns a list with the new filenames.
+    :param input_folder: File path to the folder containing the csv files to be processed.
+    :param files: List of filenames of the files to be processed.
+    :param output_folder: File path to the folder which to save the processed csvs to.
+    :return: List of the new filenames of the processed files.
     """
     if not os.path.exists(input_folder):
         raise Exception(f"Folder specified does not exist: {input_folder}")
@@ -113,7 +96,7 @@ def load_data_and_preprocess(input_folder: str, files: list, output_folder: str)
             # do preprocessing
             npdf = preprocess(pdf)
             # Save the preprocessed file
-            name = f'{f}_processed.csv'
+            name = f'{os.path.splitext(f)[0]}_processed.csv'
             npdf.to_csv(os.path.join(output_folder, name), index=False)
             saved_filenames.append(name)
 
@@ -121,8 +104,6 @@ def load_data_and_preprocess(input_folder: str, files: list, output_folder: str)
     print(f'Folder: {output_folder}')
     print(f'Files created:')
     pprint(saved_filenames)
-
-
-load_data_and_preprocess(input_folder, files, output_folder)
+    return saved_filenames
 
 
