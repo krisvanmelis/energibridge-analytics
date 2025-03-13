@@ -54,7 +54,7 @@ def energy_preprocessing(df: pd.DataFrame, column: str) -> pd.DataFrame:
 
     # Add power column
     cat = column.split('_')[0]
-    ndf[f'{cat}_POWER (W)'] = ndf[f'DIFF_{column}'] / ndf['Delta']
+    ndf[f'{cat}_POWER (W)'] = (ndf[f'DIFF_{column}'] / (ndf['Delta'] / 1000)).fillna(0)
 
     return ndf
 
@@ -69,16 +69,16 @@ def power_preprocessing(df: pd.DataFrame, column: str) -> pd.DataFrame:
     ndf = df.copy()
     # Add energy column
     cat = column.split('_')[0]
-    ndf[f'{cat}_ENERGY (J)'] = ndf[column] / ndf['Delta']
+    ndf[f'{cat}_ENERGY (J)'] = (ndf[column] * (ndf['Delta']/1000)).fillna(0)
     return ndf
 
 # ------------------------------------------------------------------------------------------------------
 
 # Loading and saving / main?
 
-input_folder = '../csv_data/input'  # TODO: change
-files = [] # TODO: max!!
-output_folder = '../csv_data/output'  # TODO: change
+input_folder = '../csv-data/input'  # TODO: change
+files = ['large_specific_extensions_0.csv']  # TODO: max!!
+output_folder = '../csv-data/preprocessing_output'  # TODO: change
 # input is lijst van bestandnamen + folder_path
 
 # laat errors throwen die in front-end gebruikt kunnen worden
@@ -119,8 +119,10 @@ def load_data_and_preprocess(input_folder: str, files: list, output_folder: str)
 
     print(f'Finished! Following new files were created:')
     print(f'Folder: {output_folder}')
-    pprint(f'Files created:\n{saved_filenames}')
+    print(f'Files created:')
+    pprint(saved_filenames)
 
 
+load_data_and_preprocess(input_folder, files, output_folder)
 
 
