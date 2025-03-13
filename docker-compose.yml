@@ -41,6 +41,7 @@ services:
     build: ./preprocessing
     volumes:
       - ./preprocessing:/app
+      - ./csv-data:/app/csv-data
     ports:
       - "5000:5000"
     depends_on:
