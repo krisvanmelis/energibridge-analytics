@@ -8,12 +8,12 @@
     <script>
         async function addConfig() {
             const name = document.getElementById('name').value;
-            const kind = document.getElementById('kind').value;
+            const type = document.getElementById('type').value;
             const csv_path = document.getElementById('csv_path').value;
             const response = await fetch('/add_config', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ name, kind, csv_path })
+                body: new URLSearchParams({ name, type, csv_path })
             });
             location.reload();
         }
@@ -41,7 +41,7 @@
         {% for config in configs %}
         <tr>
             <td>{{ config.name }}</td>
-            <td>{{ config.kind }}</td>
+            <td>{{ config.type }}</td>
             <td>{{ config.csv_path }}</td>
             <td><button onclick="deleteConfig('{{ config.name }}')">Delete</button></td>
         </tr>
@@ -52,9 +52,9 @@
     <form onsubmit="event.preventDefault(); addConfig();">
         <label>Name: <input type="text" id="name" required></label>
 
-        <label for="kind">Kind:</label>
-        <select id="kind" required>
-            <option value=1>Delta Over Time</option>
+        <label for="type">Kind:</label>
+        <select id="type" required>
+            <option value=1>System Energy</option>
         </select><br>
 
         <label>CSV Path: <input type="text" id="csv_path" required></label><br>
