@@ -48,14 +48,19 @@
         {% endfor %}
     </table>
 
-    <button id="generate-btn" onclick="window.location.href='/generate_visualizations'">Generate Visualizations</button>
-
     <h2>Add Configuration</h2>
     <form onsubmit="event.preventDefault(); addConfig();">
-        <label>Name: <input type="text" id="name" required></label><br>
-        <label>Kind: <input type="text" id="kind" required></label><br>
+        <label>Name: <input type="text" id="name" required></label>
+
+        <label for="kind">Kind:</label>
+        <select id="kind" required>
+            <option value=1>Delta Over Time</option>
+        </select><br>
+
         <label>CSV Path: <input type="text" id="csv_path" required></label><br>
         <button type="submit">Add Config</button>
     </form>
+
+    <button id="generate-btn" onclick="window.location.href='/generate_visualizations'">Generate Visualizations</button>
 </body>
 </html>

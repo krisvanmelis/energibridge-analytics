@@ -5,14 +5,14 @@ import pandas as pd
 from flask import Flask, jsonify, request, render_template, redirect
 
 from dashboards import generate_dashboard
-from visualizations import VisualizationConfig
+from visualizations import VisualizationConfig, VisualizationType
 
 app = Flask(__name__)
 
 
 # Sample list to store configurations
 configs = [
-    VisualizationConfig("Power Analysis", "Power Delta over Time", "csv-data/preprocessing_output/result_processed.csv"),
+    VisualizationConfig("Power Analysis", VisualizationType.DELTA_OVER_TIME, "csv-data/preprocessing_output/result_processed.csv"),
 ]
 # Path where Grafana dashboard config will be saved
 DASHBOARD_CONFIG_PATH = '../var/lib/grafana/dashboards/test_config.json'
@@ -33,7 +33,7 @@ def add_config():
     Endpoint to add new config to the dashboard.
     """
     data = request.form
-    new_config = VisualizationConfig(data['name'], data['kind'], data['csv_path'])
+    new_config = VisualizationConfig(data['name'], VisualizationType(int(data['kind'])), data['csv_path'])
     configs.append(new_config)
     return jsonify({'status': 'success', 'configs': [c.to_dict() for c in configs]})
 
