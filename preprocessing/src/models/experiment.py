@@ -31,4 +31,17 @@ class Experiment:
         Returns the panel as a dictionary for grafana dashboard.
         """
 
+        # Make sure all groups are preprocessed
+        for group in self.groups:
+            for trail in group.trails:
+                trail.preprocess()
+
+            group.aggregate(self.measurement_types)
+            group.summarize(self.measurement_types)
         
+        self.analyze()
+
+        # TODO: Add logic to visualize the experiment data to a panel
+        
+
+

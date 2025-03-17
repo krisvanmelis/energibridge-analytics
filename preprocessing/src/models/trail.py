@@ -1,4 +1,7 @@
 import pandas as pd
+from typing import List
+from preprocessing.src.models.types.measurement_type import MeasurementType
+from preprocessing.src.models.types.visualization_type import VisualizationType
 
 class Trail:
     # Original file path
@@ -26,5 +29,14 @@ class Trail:
         # TODO: Add preprocessing here that is needed for every trail
         # TODO: Document overview of columns and data types of preprocessed data
         self.preprocessed_data = self.raw_data
+
+    def visualize(self, measurement_types: List[MeasurementType], visualization_type: VisualizationType) -> dict:
+        """
+        Returns the panel as a dictionary for grafana dashboard.
+        """
+
+        # Make sure the data is preprocessed
+        self.preprocess()
+
 
 

@@ -2,6 +2,7 @@ import pandas as pd
 from typing import List
 from trail import Trail
 from preprocessing.src.models.types.measurement_type import MeasurementType
+from preprocessing.src.models.types.visualization_type import VisualizationType
 
 class Group:
     name: str
@@ -31,3 +32,21 @@ class Group:
         Generate summary statistics for the group.
         """
         # TODO: Add summary statistics logic here for all trails as whole
+
+
+    def visualize(self, measurement_types: List[MeasurementType], visualization_type: VisualizationType) -> dict:
+        """
+        Returns the panel as a dictionary for grafana dashboard.
+        """
+
+        # Make sure all trails are preprocessed
+        for trail in self.trails:
+            trail.preprocess()
+
+        # Aggregate data
+        self.aggregate(measurement_types)
+
+        # Summarize data
+        self.summarize(measurement_types)
+
+        # TODO: Add logic to visualize the group data to a panel
