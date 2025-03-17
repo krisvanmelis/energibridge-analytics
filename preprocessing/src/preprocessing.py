@@ -4,20 +4,21 @@ import re
 import os
 from pprint import pprint
 
+
 # ------------------------------------------------------------------------------------------------------
 
 # Preprocessing file/module
 
 
-def preprocess(csv: pd.DataFrame) -> pd.DataFrame:
+def preprocess(raw_data: pd.DataFrame) -> pd.DataFrame:
     """
     Takes imported csv as DataFrame and do necessary preprocessing. This includes finding differences in energy and
     adding converted where necessary. Adds missing power or energy columns where necessary.
-    :param csv: Loaded csv as a DataFrame
+    :param raw_data: Loaded csv as a DataFrame
     :return: Preprocessed DataFrame
     """
     # Go through all dataframe columns and preprocess where necessary
-    res = csv.copy()
+    res = raw_data.copy()
 
     # Loop through all columns in res
     for column in res.columns:

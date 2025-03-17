@@ -1,6 +1,6 @@
 import pandas as pd
 from typing import List
-from trail import Trail
+from trial import Trial
 from preprocessing.src.models.types.measurement_type import MeasurementType
 from experiment import Experiment
 from group import Group
@@ -11,7 +11,7 @@ from preprocessing.src.models.types.visualization_type import VisualizationType
 example_files = ["example1.csv", "example2.csv", "example3.csv"]
 
 # Create a list of Trail objects
-trails = [Trail(file) for file in example_files]
+trails = [Trial(file) for file in example_files]
 
 # Preprocess the data
 for trail in trails:
