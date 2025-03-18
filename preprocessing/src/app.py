@@ -51,13 +51,14 @@ def add_config() -> Response:
 
     :return: JSON response with new configs list
     """
-    data = request.form
+    data = json.loads(request.json)
     name = data['name']
     groups = [Group(group['name'], group['folder_path']) for group in data['groups']]
-    measurement_types = [MeasurementType(measurement_type) for measurement_type in data['measurement_types']]
-    experiment_type = ExperimentType(data['experiment_type'])
+    measurement_types = [MeasurementType(int(measurement_type)) for measurement_type in data['measurement_types']]
+    experiment_type = ExperimentType(int(data['experiment_type']))
     new_config = VisualizationConfig(name, groups, measurement_types, experiment_type)
-    configs.append(new_config)
+    global configs
+    configs = configs + [new_config]
 
     return jsonify({'status': 'success', 'configs': [c.to_dict() for c in configs]})
 

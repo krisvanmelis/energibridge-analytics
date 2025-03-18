@@ -24,4 +24,4 @@ class VisualizationConfig:
 
         :return: Dictionary representation of configuration.
         """
-        return {'name': self.name, 'type': str(self.experiment.experiment_type)}
+        return {'name': self.name, 'groups': [{'name': group.name} for group in self.experiment.groups]}

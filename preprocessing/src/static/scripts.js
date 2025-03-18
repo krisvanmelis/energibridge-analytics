@@ -1,3 +1,31 @@
+async function fetchConfigs() {
+    const response = await fetch('/get_configs');
+    const configs = await response.json();
+
+    const tableBody = document.querySelector('table tbody');
+    tableBody.innerHTML = `
+        <tr>
+            <th>Name</th>
+            <th>Groups</th>
+            <th>Actions</th>
+        </tr>
+    `; // Clear existing content
+
+    configs.forEach(config => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${config.name}</td>
+            <td>
+                <ul>
+                    ${config.groups.map(group => `<li>${group.name}</li>`).join('')}
+                </ul>
+            </td>
+            <td><button onclick="deleteConfig('${config.name}')">Delete</button></td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
 async function addConfig() {
     const name = document.getElementById('name').value;
     const experiment_type = document.getElementById('experiment_type').value;
@@ -6,11 +34,10 @@ async function addConfig() {
         name: entry.querySelector('.group-name').value,
         folder_path: entry.querySelector('.group-folder').value
     }));
-
     const response = await fetch('/add_config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, experiment_type, measurement_types, groups })
+        body: JSON.stringify({ name, experiment_type, measurement_types, groups }),
     });
     location.reload();
 }
@@ -39,3 +66,7 @@ async function deleteConfig(name) {
     });
     location.reload();
 }
+
+window.onload = async () => {
+    await fetchConfigs();
+};
