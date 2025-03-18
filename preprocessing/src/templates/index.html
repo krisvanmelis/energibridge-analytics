@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energibridge Visualizations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+</head>
+<body>
+    <h1>Energibridge Visualization Generator</h1>
+    <h2>Visualization Configurations</h2>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Groups</th>
+            <th>Actions</th>
+        </tr>
+        {% for config in configs %}
+        <tr>
+            <td>{{ config.name }}</td>
+            <td>
+                <ul>
+                    {% for group in config.groups %}
+                    <li>{{ group.name }})</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td><button onclick="deleteConfig('{{ config.name }}')">Delete</button></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Add Configuration</h2>
+    <form onsubmit="event.preventDefault(); addConfig();">
+        <label>Configuration Name: <input type="text" id="name" required></label>
+        <label>Experiment Type:</label>
+        <select id="experiment_type" required>
+            <option value=1>Difference</option>
+            <option value=2>Significance Test</option>
+        </select>
+        <label>Measurement Types:</label>
+        <label><input type="checkbox" class="measurement-type" value=1> System Energy</label>
+        <label><input type="checkbox" class="measurement-type" value=2> CPU Power</label>
+        <div id="groups-container"></div>
+        <button type="button" onclick="addGroupField()">Add Group</button>
+        <br><br>
+        <button type="submit">Add Configuration</button>
+    </form>
+
+    <button id="generate-btn" onclick="window.location.href='/generate_visualizations'">Generate Visualizations</button>
+</body>
+</html>

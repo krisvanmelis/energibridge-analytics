@@ -4,11 +4,9 @@ from re import match
 import pandas as pd
 import numpy as np
 from typing import List
-
-# from preprocessing.src.app import OUTPUT_FOLDER
-from trial import Trial
-from preprocessing.src.models.types.measurement_type import MeasurementType
-from preprocessing.src.models.types.visualization_type import VisualizationType
+from models.trial import Trial
+from models.types.measurement_type import MeasurementType
+from models.types.visualization_type import VisualizationType
 import os
 
 
