@@ -127,7 +127,7 @@
                     "root_selector": "",
                     "source": "url",
                     "type": "csv",
-                    "url": "http://nginx/csv-data/preprocessing_output/result_processed_preprocessed_preprocessed_preprocessed_preprocessed.csv",
+                    "url": "http://nginx/csv-data/preprocessing_output/large_specific_extensions_0_processed_preprocessed_preprocessed_preprocessed_preprocessed_preprocessed.csv",
                     "url_options": {
                         "data": "",
                         "method": "GET"
