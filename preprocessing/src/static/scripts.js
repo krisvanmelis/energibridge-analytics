@@ -34,10 +34,11 @@ async function addConfig() {
         name: entry.querySelector('.group-name').value,
         folder_path: entry.querySelector('.group-folder').value
     }));
+    const body = JSON.stringify({ name, experiment_type, measurement_types, groups });
     const response = await fetch('/add_config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, experiment_type, measurement_types, groups }),
+        body: JSON.stringify(body),
     });
     location.reload();
 }
