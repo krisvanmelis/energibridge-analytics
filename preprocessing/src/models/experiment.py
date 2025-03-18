@@ -1,8 +1,8 @@
 import pandas as pd
 from typing import List
 from group import Group
-from types.experiment_type import ExperimentType
-from types.measurement_type import MeasurementType
+from types2.experiment_type import ExperimentType
+from types2.measurement_type import MeasurementType
 
 
 class Experiment:
@@ -48,6 +48,5 @@ class Experiment:
         self.analyze()
 
         # TODO: Add logic to visualize the experiment data to a panel
-        
 
 

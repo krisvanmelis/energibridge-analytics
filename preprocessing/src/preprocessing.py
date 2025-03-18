@@ -19,6 +19,7 @@ def preprocess(raw_data: pd.DataFrame) -> pd.DataFrame:
     """
     # Go through all dataframe columns and preprocess where necessary
     res = raw_data.copy()
+    res['Time'] = res['Time'] - res['Time'].min()
 
     # Loop through all columns in res
     for column in res.columns:

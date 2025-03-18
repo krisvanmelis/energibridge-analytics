@@ -21,6 +21,8 @@ configs = [
 DASHBOARD_CONFIG_PATH = '../var/lib/grafana/dashboards/test_config.json'
 GRAFANA_URL = 'http://localhost:3000'
 
+OUTPUT_FOLDER = 'csv-data/preprocessing_output/'
+
 
 @app.route('/')
 def home() -> str:

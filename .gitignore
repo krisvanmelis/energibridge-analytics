@@ -22,3 +22,5 @@ volumes/
 Thumbs.db
 
 .idea/
+
+preprocessing/__pycache__/
