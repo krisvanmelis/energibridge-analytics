@@ -8,14 +8,26 @@ import pandas as pd
 from flask import Flask, jsonify, request, render_template, redirect, Response
 
 from dashboards import generate_dashboard
-from visualizations import VisualizationConfig, VisualizationType
+from models.visualization_config import VisualizationConfig
+from models.group import Group
+from models.types.experiment_type import ExperimentType
+from models.types.measurement_type import MeasurementType
 
 app = Flask(__name__)
 
 # Sample list to store configurations
 configs = [
-    VisualizationConfig("Power Analysis", VisualizationType.SYSTEM_ENERGY,
-                        "csv-data/preprocessing_output/result_processed.csv"),
+    VisualizationConfig(
+        name = "sample visualization",
+        groups = [
+          Group(
+              name = "sample visualization",
+              folder_path = "csv-data/preprocessing_output",
+          )
+        ],
+        measurement_types = [MeasurementType.SYSTEM_ENERGY],
+        experiment_type = ExperimentType.DIFFERENCE,
+    ),
 ]
 # Path where Grafana dashboard config will be saved
 DASHBOARD_CONFIG_PATH = '../var/lib/grafana/dashboards/test_config.json'
@@ -39,9 +51,15 @@ def add_config() -> Response:
 
     :return: JSON response with new configs list
     """
-    data = request.form
-    new_config = VisualizationConfig(data['name'], VisualizationType(int(data['type'])), data['csv_path'])
-    configs.append(new_config)
+    data = json.loads(request.json)
+    name = data['name']
+    groups = [Group(group['name'], group['folder_path']) for group in data['groups']]
+    measurement_types = [MeasurementType(int(measurement_type)) for measurement_type in data['measurement_types']]
+    experiment_type = ExperimentType(int(data['experiment_type']))
+    new_config = VisualizationConfig(name, groups, measurement_types, experiment_type)
+    global configs
+    configs = configs + [new_config]
+
     return jsonify({'status': 'success', 'configs': [c.to_dict() for c in configs]})
 
 
@@ -104,7 +122,7 @@ def main() -> None:
     """
     Main function, entrypoint of Flask app.
     """
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001)
 
 
 if __name__ == '__main__':

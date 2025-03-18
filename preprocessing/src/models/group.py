@@ -1,14 +1,14 @@
 import pandas as pd
 from typing import List
-from trial import Trial
-from preprocessing.src.models.types.measurement_type import MeasurementType
-from preprocessing.src.models.types.visualization_type import VisualizationType
+from models.trial import Trial
+from models.types.measurement_type import MeasurementType
+from models.types.visualization_type import VisualizationType
 import os
 
 
 class Group:
     name: str
-    trails: List[Trial]
+    trials: List[Trial]
 
     # Aggregated data from all trails (e.g. mean, median, std over time)
     aggregate_data: pd.DataFrame
@@ -16,21 +16,23 @@ class Group:
     # Summary statistics for the whole group (e.g. total energy, peak power)
     statistics_summary: pd.DataFrame
 
-    def __init__(self, name: str, trails: List[Trial] | List[str]) -> None:
+    def __init__(self, name: str, folder_path: str) -> None:
         self.name = name
-        if type(trails[0]) is str:
-            self.trails = [Trial(trail) for trail in trails]
-        else:
-            self.trails = trails
+
+        # Construct trials by loading csv files in folder
+        if not os.path.isdir(folder_path):
+            raise FileNotFoundError(folder_path)
+
+        self.trials = [Trial(os.path.join(folder_path, file_name)) for file_name in os.listdir(folder_path) if file_name.endswith(".csv")]
 
     def add_trial(self, trial: Trial | str) -> None:
         """
         Add a trial to the group.
         """
         if trial is str:
-            self.trails.append(Trial(trial))
+            self.trials.append(Trial(trial))
         else:
-            self.trails.append(trial)
+            self.trials.append(trial)
 
     def aggregate(self, measurement_types: List[MeasurementType]) -> None:
         """

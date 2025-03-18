@@ -1,8 +1,8 @@
 import pandas as pd
 from typing import List
-from group import Group
-from types.experiment_type import ExperimentType
-from types.measurement_type import MeasurementType
+from models.group import Group
+from models.types.experiment_type import ExperimentType
+from models.types.measurement_type import MeasurementType
 
 
 class Experiment:
