@@ -1,8 +1,8 @@
 import pandas as pd
 from typing import List
-from models.types.measurement_type import MeasurementType
-from models.types.visualization_type import VisualizationType
-import preprocessing as pp
+from preprocessing.src.models.types.measurement_type import MeasurementType
+from preprocessing.src.models.types.visualization_type import VisualizationType
+import preprocessing.src.preprocessing as pp
 import os
 
 

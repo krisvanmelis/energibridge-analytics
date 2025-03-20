@@ -4,9 +4,9 @@ from re import match
 import pandas as pd
 import numpy as np
 from typing import List
-from models.trial import Trial
-from models.types.measurement_type import MeasurementType
-from models.types.visualization_type import VisualizationType
+from preprocessing.src.models.trial import Trial
+from preprocessing.src.models.types.measurement_type import MeasurementType
+from preprocessing.src.models.types.visualization_type import VisualizationType
 import os
 
 
@@ -32,19 +32,12 @@ class Group:
 
         self.trials = [Trial(os.path.join(folder_path, file_name), os.path.join(output_folder_path, file_name))
                        for file_name in os.listdir(folder_path) if file_name.endswith(".csv")]
+
+        self.aggregate_data = None
+        self.statistics_summary = None
         # TODO: aggregation and summarisation
 
-    # def add_trial(self, trial: Trial | str) -> None:
-    #     """
-    #     Add a trial to the group.
-    #     """
-    #     if trial is str:
-    #         self.trials.append(Trial(trial))
-    #     else:
-    #         self.trials.append(trial)
-    #     # re-aggregate and re-summarise?
-
-    def aggregate(self, measurement_types: List[MeasurementType])-> str:
+    def aggregate(self, measurement_types: List[MeasurementType]) -> str:
         """
                 Aggregate the data from all trails in the group for the specified columns.
                 TODO: have smth of a dictionary for the things to do?? idk > mode of each delta > round times and use those as index, interpolate missing values?
@@ -86,9 +79,9 @@ class Group:
             self.aggregate_data[f'{c}_min'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].min(axis=1)
             self.aggregate_data[f'{c}_max'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].max(axis=1)
 
-    def summarize(self, measurement_types: List[MeasurementType]) -> None:
+    def summarize(self, measurement_types: List[MeasurementType] = []) -> None:
         """
-        Generate summary statistics for the group.
+        Generate summary statistics for the group. - BROKEN, WILL BE FIXED ASAP
         - Total energy per trial
         - peak power per trial
         - average total energy overall
@@ -96,9 +89,21 @@ class Group:
         - ...
         """
         # TODO: Add summary statistics logic here for all trails as whole --- columns??
-        # summary = pd.DataFrame(columns=['Total Energy (J)', 'Peak Power (W)', 'Average Power (W)'])
-        # for trial in self.trials:
-        #     summary.loc[trial.name] = [trial['Energy'].sum(), trial['Power'].max(), trial['Power'].mean()]
+        summary = pd.DataFrame(columns=['Trial name', 'Total Energy (J)', 'Peak Power (W)', 'Average Power (W)']).set_index('Trial name')
+        for trial in self.trials:
+            placeholder = ''
+            row = [
+                trial.preprocessed_data[placeholder][-1] - trial.preprocessed_data[placeholder][0],
+                trial.preprocessed_data[placeholder].max(),
+                trial.preprocessed_data[placeholder].mean()
+                ]
+            summary.loc[trial.filename] = row
+        summary.loc['Mean Overall'] = [
+            summary['Total Energy (J)'].mean(),
+            summary['Peak Power (W)'].mean(),
+            summary['Average Power (W)'].mean()
+        ]
+        self.statistics_summary = summary
 
     def visualize(self, measurement_types: List[MeasurementType], visualization_type: VisualizationType) -> dict:
         """

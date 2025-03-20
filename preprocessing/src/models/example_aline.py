@@ -9,5 +9,7 @@ group = Group('example group', folder, output_folder=output)
 
 group.aggregate([MeasurementType.CPU_ENERGY])
 
+# group.summarize()
+
 group.print()
 print(group.aggregate_data.columns)
