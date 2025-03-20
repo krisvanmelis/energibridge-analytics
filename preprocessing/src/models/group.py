@@ -4,6 +4,9 @@ from re import match
 import pandas as pd
 import numpy as np
 from typing import List
+
+from numpy.ma.core import outer, argmax
+
 from preprocessing.src.models.trial import Trial
 from preprocessing.src.models.types.measurement_type import MeasurementType
 from preprocessing.src.models.types.visualization_type import VisualizationType
@@ -33,51 +36,44 @@ class Group:
         self.trials = [Trial(os.path.join(folder_path, file_name), os.path.join(output_folder_path, file_name))
                        for file_name in os.listdir(folder_path) if file_name.endswith(".csv")]
 
-        self.aggregate_data = None
-        self.statistics_summary = None
-        # TODO: aggregation and summarisation
+        self.aggregate()
+        self.summarize()
 
-    def aggregate(self, measurement_types: List[MeasurementType]) -> str:
+    def aggregate(self) -> str:
         """
-                Aggregate the data from all trails in the group for the specified columns.
-                TODO: have smth of a dictionary for the things to do?? idk > mode of each delta > round times and use those as index, interpolate missing values?
-                TODO: aggregate for differing deltas?
-                TODO: outlier detection?
+                Aggregate the data from all trails in the group for the specified columns
+                TODO: good aggregation with interpolation for differing deltas
+                TODO: outlier detection? -> flag possible?
                 :return filepath to the aggregate dataframe
                 """
-        # Quantise / synchronise time -> mode of Deltas is assumed delta?
-        # get all deltas across all trials, take the mode (assumes this is the set delta in energibridge)
-        deltas = pd.DataFrame([trial.preprocessed_data['Delta'] for trial in self.trials])
-        delta = deltas.mode(axis=1).mode().iloc[0, 0]  # assume all deltas are the same
-
-        # set the time to round to nearest delta
-        time = np.arange(0, self.trials[0].preprocessed_data['Time'].max(), delta)
-        deltal = np.full(len(time), delta)
-        self.aggregate_data = pd.DataFrame({'Time': time, 'Delta': deltal})
-
         # retrieve the wanted columns for the measurement types
-        columns = []
-        for mt in measurement_types:
-            columns += mt.columns()
+        columns = self.trials[0].preprocessed_data.columns
 
-        available_columns = self.trials[0].preprocessed_data.columns
-        # filter out all columns in available_columns where the column name doesn't match any regex in columns
-        matching_columns = [col for col in available_columns if any(re.search(pattern, col) for pattern in columns)]
-        # fill in the data
-        ndf = self.aggregate_data.copy()
-        for trial in self.trials:
-            for c in matching_columns:
-                # do the funky inserting here if differing deltas are supported
-                ndf[f'{trial.filename}\\{c}'] = trial.preprocessed_data[c]
+        # concatenate all trials into one dataframe
+        ndf = pd.concat(
+            [trial.preprocessed_data for trial in self.trials],
+            axis=1,
+            join='outer',
+            keys=[trial.filename for trial in self.trials],
+            names=['Trial name', 'Column ID']).fillna(0).replace([np.inf, -np.inf], 0, inplace=False)
 
-        for c in matching_columns:
-            self.aggregate_data[f'{c}_mean'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].mean(axis=1)
-            self.aggregate_data[f'{c}_std'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].std(axis=1)
-            self.aggregate_data[f'{c}_median'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].median(axis=1)
-            self.aggregate_data[f'{c}_min'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].min(axis=1)
-            self.aggregate_data[f'{c}_max'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].max(axis=1)
+        # flatten the multiindex to a dataframe by renaming columns to '{trial name}_{column id}'
+        ndf.columns = [f'{trial}\\{column}' for trial, column in ndf.columns.to_flat_index()]
 
-    def summarize(self, measurement_types: List[MeasurementType] = []) -> None:
+        max_length_index = argmax([len(trial.preprocessed_data) for trial in self.trials])
+        dictionary = {
+            'Time': self.trials[max_length_index].preprocessed_data['Time'],
+            'Delta': self.trials[max_length_index].preprocessed_data['Delta']
+        }
+        for c in columns:
+            dictionary[f'{c}_mean'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].mean(axis=1)
+            dictionary[f'{c}_std'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].std(axis=1)
+            dictionary[f'{c}_median'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].median(axis=1)
+            dictionary[f'{c}_min'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].min(axis=1)
+            dictionary[f'{c}_max'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].max(axis=1)
+        self.aggregate_data = pd.DataFrame(dictionary)
+
+    def summarize(self) -> None:
         """
         Generate summary statistics for the group. - BROKEN, WILL BE FIXED ASAP
         - Total energy per trial

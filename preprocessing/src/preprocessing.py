@@ -14,12 +14,23 @@ def preprocess(raw_data: pd.DataFrame) -> pd.DataFrame:
     """
     Takes imported csv as DataFrame and do necessary preprocessing. This includes finding differences in energy and
     adding converted where necessary. Adds missing power or energy columns where necessary.
+
+    Time and delta is quantised to the most occurring delta in the data (we assume this to be the delta entered into the
+    EnergiBridge call). Because differing deltas usually differ by 1-2ms, we round the time and assume this to have
+    little effect on power and energy calculations.
+
     :param raw_data: Loaded csv as a DataFrame
     :return: Preprocessed DataFrame
     """
     # Go through all dataframe columns and preprocess where necessary
     res = raw_data.copy()
+    # Normalise time to start at 0
     res['Time'] = res['Time'] - res['Time'].min()
+
+    # Quantisation of delta and time to become multiples of delta
+    delta = res['Delta'].mode()
+    res['Delta'] = res['Delta'].apply(lambda x: round(x / delta) * delta)
+    res['Time'] = res['Time'].apply(lambda x: round(x / delta) * delta)
 
     # For windows, the package energy is the total energy used by the CPU
     if 'CPU_ENERGY (J)' not in res.columns and 'PACKAGE_ENERGY (J)' in res.columns:

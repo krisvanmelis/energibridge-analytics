@@ -10,7 +10,7 @@ class Trial:
     # Original file path
     raw_file_path: str
     filename: str
-
+    # TODO: quantise time to delta
     # Preprocessed file path
     preprocessed_file_path: str
 
