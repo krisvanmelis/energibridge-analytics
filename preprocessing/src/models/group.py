@@ -21,9 +21,11 @@ class Group:
 
         # Construct trials by loading csv files in folder
         if not os.path.isdir(folder_path):
-            raise FileNotFoundError(folder_path)
+            raise FileNotFoundError(f'Folder does not exist: "{folder_path}"')
 
         self.trials = [Trial(os.path.join(folder_path, file_name)) for file_name in os.listdir(folder_path) if file_name.endswith(".csv")]
+        if len(self.trials) == 0:
+            raise FileNotFoundError(f'No trials found in folder: "{folder_path}"')
 
     def add_trial(self, trial: Trial | str) -> None:
         """
@@ -59,3 +61,9 @@ class Group:
         self.summarize(measurement_types)
 
         # TODO: Add logic to visualize the group data to a panel
+
+    def to_dict(self) -> dict:
+        """
+        Convert group to dictionary parseable by frontend.
+        """
+        return {'name': self.name, 'trial_count': str(len(self.trials))}

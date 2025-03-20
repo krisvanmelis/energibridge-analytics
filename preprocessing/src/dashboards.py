@@ -3,7 +3,7 @@ Module containing functionality for Grafana dashboards.
 """
 from typing import List
 
-from models.visualization_config import VisualizationConfig
+from models.panel_config import PanelConfig
 from models.types.measurement_type import MeasurementType
 from models.group import Group
 
@@ -62,7 +62,7 @@ def generate_target_from_group(group: Group, columns: List[dict]) -> dict:
     }
 
 
-def generate_panel_from_config(config: VisualizationConfig) -> dict:
+def generate_panel_from_config(config: PanelConfig) -> dict:
     """
     Generate a dashboard panel configuration based on visualization config.
 
@@ -166,7 +166,7 @@ def generate_panel_from_config(config: VisualizationConfig) -> dict:
     }
 
 
-def generate_dashboard(configs: List[VisualizationConfig]) -> dict:
+def generate_dashboard(configs: List[PanelConfig]) -> dict:
     """
     Generate a Grafana dashboard configuration as a dictionary based on visualization configurations.
 
