@@ -21,6 +21,10 @@ def preprocess(raw_data: pd.DataFrame) -> pd.DataFrame:
     res = raw_data.copy()
     res['Time'] = res['Time'] - res['Time'].min()
 
+    # For windows, the package energy is the total energy used by the CPU
+    if 'CPU_ENERGY (J)' not in res.columns and 'PACKAGE_ENERGY (J)' in res.columns:
+        res['CPU_ENERGY (J)'] = res['PACKAGE_ENERGY (J)']
+
     # Loop through all columns in res
     for column in res.columns:
         # Check if the column name matches the regex pattern
@@ -62,6 +66,9 @@ def power_preprocessing(df: pd.DataFrame, column: str) -> pd.DataFrame:
     :return: Copy of the DataFrame with the added energy column.
     """
     ndf = df.copy()
+    # Rename to have (W) instead of (Watts)
+    if column.endswith('Watts'):
+        column = column.replace('Watts', 'W')
     # Add energy column
     cat = column.split('_')[0]
     ndf[f'DIFF_{cat}_ENERGY (J)'] = (ndf[column] * (ndf['Delta']/1000)).fillna(0)

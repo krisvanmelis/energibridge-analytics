@@ -45,8 +45,6 @@ class Group:
                 TODO: outlier detection?
                 :return filepath to the aggregate dataframe
                 """
-        ndf = pd.DataFrame()
-
         # Quantise / synchronise time -> mode of Deltas is assumed delta?
         # get all deltas across all trials, take the mode (assumes this is the set delta in energibridge)
         deltas = pd.DataFrame([trial.preprocessed_data['Delta'] for trial in self.trials])
@@ -89,19 +87,23 @@ class Group:
         - ...
         """
         # TODO: Add summary statistics logic here for all trails as whole --- columns??
-        summary = pd.DataFrame(columns=['Trial name', 'Total Energy (J)', 'Peak Power (W)', 'Average Power (W)']).set_index('Trial name')
+        summary = pd.DataFrame(columns=['Trial name', 'Total Energy (J)', 'Peak Power (W)', 'Median Power (W)']).set_index('Trial name')
         for trial in self.trials:
-            placeholder = ''
             row = [
-                trial.preprocessed_data[placeholder][-1] - trial.preprocessed_data[placeholder][0],
-                trial.preprocessed_data[placeholder].max(),
-                trial.preprocessed_data[placeholder].mean()
+                trial.preprocessed_data['CPU_ENERGY (J)'].iloc[-1] - trial.preprocessed_data['CPU_ENERGY (J)'].iloc[0],
+                trial.preprocessed_data['CPU_POWER (W)'].max(),
+                trial.preprocessed_data['CPU_POWER (W)'].median()
                 ]
             summary.loc[trial.filename] = row
         summary.loc['Mean Overall'] = [
             summary['Total Energy (J)'].mean(),
             summary['Peak Power (W)'].mean(),
-            summary['Average Power (W)'].mean()
+            summary['Median Power (W)'].mean()
+        ]
+        summary.loc['Median Overall'] = [
+            summary['Total Energy (J)'].median(),
+            summary['Peak Power (W)'].median(),
+            summary['Median Power (W)'].median()
         ]
         self.statistics_summary = summary
 
