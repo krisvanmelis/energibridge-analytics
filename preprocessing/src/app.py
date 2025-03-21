@@ -18,14 +18,15 @@ app = Flask(__name__)
 # Sample list to store configurations
 configs = [
     VisualizationConfig(
-        name = "sample visualization",
-        groups = [
+        name="sample visualization",
+        groups=[
           Group(
-              name = "sample visualization",
-              folder_path = "csv-data/preprocessing_output",
+              name="sample visualization",
+              folder_path="csv-data/input/sample_group",
+              output_folder="csv-data/preprocessing_output",
           )
         ],
-        measurement_types = [MeasurementType.SYSTEM_ENERGY],
+        measurement_types = [MeasurementType.CPU_ENERGY],
         experiment_type = ExperimentType.DIFFERENCE,
     ),
 ]

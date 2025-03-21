@@ -7,9 +7,13 @@ from typing import List
 
 from numpy.ma.core import outer, argmax
 
-from preprocessing.src.models.trial import Trial
-from preprocessing.src.models.types.measurement_type import MeasurementType
-from preprocessing.src.models.types.visualization_type import VisualizationType
+# from preprocessing.src.models.trial import Trial
+# from preprocessing.src.models.types.measurement_type import MeasurementType
+# from preprocessing.src.models.types.visualization_type import VisualizationType
+
+from models.trial import Trial
+from models.types.measurement_type import MeasurementType
+from models.types.visualization_type import VisualizationType
 import os
 
 
@@ -55,10 +59,12 @@ class Group:
             axis=1,
             join='outer',
             keys=[trial.filename for trial in self.trials],
-            names=['Trial name', 'Column ID']).fillna(0).replace([np.inf, -np.inf], 0, inplace=False)
+            names=['Trial name', 'Column ID']
+        ).fillna(0).replace([np.inf, -np.inf], 0, inplace=False)
 
         # flatten the multiindex to a dataframe by renaming columns to '{trial name}_{column id}'
-        ndf.columns = [f'{trial}\\{column}' for trial, column in ndf.columns.to_flat_index()]
+        ndf.columns = [f'{trial}:{column}' for trial, column in ndf.columns.to_flat_index()]
+        print(ndf.columns)
 
         max_length_index = argmax([len(trial.preprocessed_data) for trial in self.trials])
         dictionary = {
@@ -66,11 +72,11 @@ class Group:
             'Delta': self.trials[max_length_index].preprocessed_data['Delta']
         }
         for c in columns:
-            dictionary[f'{c}_mean'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].mean(axis=1)
-            dictionary[f'{c}_std'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].std(axis=1)
-            dictionary[f'{c}_median'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].median(axis=1)
-            dictionary[f'{c}_min'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].min(axis=1)
-            dictionary[f'{c}_max'] = ndf[[f'{trial.filename}\\{c}' for trial in self.trials]].max(axis=1)
+            dictionary[f'{c}_mean'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].mean(axis=1)
+            dictionary[f'{c}_std'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].std(axis=1)
+            dictionary[f'{c}_median'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].median(axis=1)
+            dictionary[f'{c}_min'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].min(axis=1)
+            dictionary[f'{c}_max'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].max(axis=1)
         self.aggregate_data = pd.DataFrame(dictionary)
 
     def summarize(self) -> None:
@@ -80,7 +86,7 @@ class Group:
         - peak power per trial
         - average total energy overall
         - average peak power overall (Row)
-        - ...
+        - TODO: normal tests? (for energy consumption, peak power, etc.)
         """
         # TODO: Add summary statistics logic here for all trails as whole --- columns??
         summary = pd.DataFrame(columns=['Trial name', 'Total Energy (J)', 'Peak Power (W)', 'Median Power (W)']).set_index('Trial name')

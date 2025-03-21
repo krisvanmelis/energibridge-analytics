@@ -1,8 +1,12 @@
 import pandas as pd
 from typing import List
-from preprocessing.src.models.types.measurement_type import MeasurementType
-from preprocessing.src.models.types.visualization_type import VisualizationType
-import preprocessing.src.preprocessing as pp
+# from preprocessing.src.models.types.measurement_type import MeasurementType
+# from preprocessing.src.models.types.visualization_type import VisualizationType
+# import preprocessing.src.preprocessing as pp
+
+from models.types.measurement_type import MeasurementType
+from models.types.visualization_type import VisualizationType
+import preprocessing as pp
 import os
 
 
@@ -10,7 +14,7 @@ class Trial:
     # Original file path
     raw_file_path: str
     filename: str
-    # TODO: quantise time to delta
+
     # Preprocessed file path
     preprocessed_file_path: str
 
