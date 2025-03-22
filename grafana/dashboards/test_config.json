@@ -123,7 +123,38 @@
                     "format": "table",
                     "global_query_id": "",
                     "parser": "backend",
-                    "refId": "sample visualization",
+                    "refId": "g1",
+                    "root_selector": "",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/preprocessing_output/large_specific_extensions_0_processed_preprocessed_preprocessed_preprocessed_preprocessed_preprocessed.csv",
+                    "url_options": {
+                        "data": "",
+                        "method": "GET"
+                    }
+                },
+                {
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch"
+                        },
+                        {
+                            "selector": "SYSTEM_ENERGY (J)",
+                            "text": "SYSTEM_ENERGY (J)",
+                            "type": "number"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "filters": [],
+                    "format": "table",
+                    "global_query_id": "",
+                    "parser": "backend",
+                    "refId": "g2",
                     "root_selector": "",
                     "source": "url",
                     "type": "csv",
@@ -134,7 +165,7 @@
                     }
                 }
             ],
-            "title": "sample visualization",
+            "title": "v1",
             "type": "timeseries"
         },
         {
@@ -239,11 +270,11 @@
                     "format": "table",
                     "global_query_id": "",
                     "parser": "backend",
-                    "refId": "1",
+                    "refId": "g1",
                     "root_selector": "",
                     "source": "url",
                     "type": "csv",
-                    "url": "http://nginx/csv-data/preprocessing_output/large_specific_extensions_0_processed_preprocessed_preprocessed_preprocessed_preprocessed_preprocessed_preprocessed.csv",
+                    "url": "http://nginx/csv-data/preprocessing_output/large_specific_extensions_0_processed_preprocessed_preprocessed_preprocessed_preprocessed_preprocessed.csv",
                     "url_options": {
                         "data": "",
                         "method": "GET"
@@ -270,7 +301,7 @@
                     "format": "table",
                     "global_query_id": "",
                     "parser": "backend",
-                    "refId": "2",
+                    "refId": "g2",
                     "root_selector": "",
                     "source": "url",
                     "type": "csv",
@@ -281,7 +312,7 @@
                     }
                 }
             ],
-            "title": "eww",
+            "title": "v2",
             "type": "timeseries"
         }
     ],

@@ -100,3 +100,32 @@ th {
 .checkbox-item input[type="checkbox"] {
     width: auto; /* Prevents checkboxes from stretching */
 }
+
+#groups {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #3a7d44;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #2e5730;
+    height: 150px; /* Increased height for easier multiple selection */
+    overflow-y: auto; /* Enables scrolling for long lists */
+}
+
+.selected-items {
+    margin-top: 10px;
+    padding: 10px;
+    border: 2px solid #3a7d44;
+    border-radius: 4px;
+    background-color: #e6f4ea;
+}
+
+.selected-items span {
+    display: inline-block;
+    background-color: #3a7d44;
+    color: #ffffff;
+    padding: 5px 10px;
+    margin: 3px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+}

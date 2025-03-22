@@ -40,24 +40,20 @@ document.getElementById('panel-form').addEventListener('submit', function(e) {
       .then(data => updatePanelTable(data.panels));
 });
 
-document.getElementById('generate-visualizations').addEventListener('click', function() {
-    fetch('/visualizations/generate', { method: 'POST' })
-        .then(response => window.location.href = response.url);
-});
+document.getElementById('groups').addEventListener('change', function () {
+    const selectedGroups = Array.from(this.selectedOptions).map(option => option.text);
+    const selectedDisplay = document.getElementById('selected-groups');
 
-function updateTable(tableId, data) {
-    const tableBody = document.getElementById(tableId).querySelector('tbody');
-    tableBody.innerHTML = '';
-    data.forEach(item => {
-        const row = document.createElement('tr');
-        for (const value of Object.values(item)) {
-            const cell = document.createElement('td');
-            cell.textContent = value;
-            row.appendChild(cell);
-        }
-        tableBody.appendChild(row);
+    // Clear previous selections
+    selectedDisplay.innerHTML = '';
+
+    // Add selected items as badges
+    selectedGroups.forEach(group => {
+        const span = document.createElement('span');
+        span.textContent = group;
+        selectedDisplay.appendChild(span);
     });
-}
+});
 
 function updateGroupTable(groups) {
     const tableBody = document.getElementById('group-table').querySelector('tbody');

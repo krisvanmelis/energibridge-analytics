@@ -117,7 +117,7 @@ def delete_panel() -> Response:
         return jsonify({'status': 'error', 'message': str(e)})
 
 
-@app.route('/visualizations/generate', methods=['POST'])
+@app.route('/visualizations/generate')
 def generate_visualizations() -> Response:
     """
     Endpoint to generate visualizations (and grafana dashboard configuration).

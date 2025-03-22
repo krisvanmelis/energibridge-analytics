@@ -32,10 +32,10 @@
 
                 <label for="groups">Groups:</label>
                 <select id="groups" multiple>
-                    {% for panel in panels %}
-                        <option value="{{ panel.name }}">{{ panel.name }}</option>
-                    {% endfor %}
+                   <!-- Data filled dynamically -->
                 </select>
+
+                <div id="selected-groups" class="selected-items"></div>
 
                 <label for="experiment-type">Experiment Type:</label>
                 <select id="experiment-type" name="experiment_type" required>
@@ -88,7 +88,7 @@
                 </tbody>
             </table>
 
-            <button id="generate-visualizations">Generate Visualizations</button>
+            <button id="generate-visualizations" onclick="window.location.href='/visualizations/generate'">Generate Visualizations</button>
         </section>
     </main>
 </body>
