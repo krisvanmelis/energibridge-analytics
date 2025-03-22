@@ -51,3 +51,10 @@ class MeasurementType(Enum):
             'GPU_METRICS': [r'GPU*']
         }
         return dictionary[self.name]
+
+
+    def __str__(self):
+        """
+        String representation of the measurement type.
+        """
+        return " ".join([word[0].upper() + word[1:] for word in self.name.lower().split("_")])

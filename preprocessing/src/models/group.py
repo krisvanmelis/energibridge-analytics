@@ -39,6 +39,8 @@ class Group:
 
         self.trials = [Trial(os.path.join(folder_path, file_name), os.path.join(output_folder_path, file_name))
                        for file_name in os.listdir(folder_path) if file_name.endswith(".csv")]
+        if len(self.trials) == 0:
+            raise FileNotFoundError(f'No trials found in folder: "{folder_path}"')
 
         self.aggregate()
         self.summarize()
@@ -132,3 +134,10 @@ class Group:
         if self.statistics_summary is not None:
             print("Statistics Summary:")
             print(self.statistics_summary)
+
+
+    def to_dict(self) -> dict:
+        """
+        Convert group to dictionary parseable by frontend.
+        """
+        return {'name': self.name, 'trial_count': str(len(self.trials))}

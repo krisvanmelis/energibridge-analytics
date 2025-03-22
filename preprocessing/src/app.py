@@ -2,39 +2,23 @@
 Module containing Flask application for generating grafana dashboard configurations.
 """
 import json
-import os
 
-import pandas as pd
 from flask import Flask, jsonify, request, render_template, redirect, Response
 
-from dashboards import generate_dashboard
-from models.visualization_config import VisualizationConfig
-from models.group import Group
 from models.types.experiment_type import ExperimentType
 from models.types.measurement_type import MeasurementType
+from group_service import GroupService
+from panel_service import PanelService
+from grafana_visualization_service import GrafanaVisualizationService
 
-app = Flask(__name__)
-
-# Sample list to store configurations
-configs = [
-    VisualizationConfig(
-        name="sample visualization",
-        groups=[
-          Group(
-              name="sample visualization",
-              folder_path="csv-data/input/sample_group",
-              output_folder="csv-data/preprocessing_output",
-          )
-        ],
-        measurement_types = [MeasurementType.CPU_ENERGY],
-        experiment_type = ExperimentType.DIFFERENCE,
-    ),
-]
 # Path where Grafana dashboard config will be saved
-DASHBOARD_CONFIG_PATH = '../var/lib/grafana/dashboards/test_config.json'
+DASHBOARD_CONFIG_SAVE_PATH = '../var/lib/grafana/dashboards/test_config.json'
 GRAFANA_URL = 'http://localhost:3000'
 
-OUTPUT_FOLDER = 'csv-data/preprocessing_output/'
+app = Flask(__name__)
+group_service = GroupService()
+panel_service = PanelService(group_service)
+grafana_visualization_service = GrafanaVisualizationService(DASHBOARD_CONFIG_SAVE_PATH)
 
 
 @app.route('/')
@@ -44,42 +28,97 @@ def home() -> str:
 
     :return: Rendered home page
     """
-    return render_template('index.html', configs=configs)
+    return render_template('index.html', panels=panel_service.get_panels())
 
 
-@app.route('/add_config', methods=['POST'])
-def add_config() -> Response:
+@app.route('/groups')
+def get_groups() -> Response:
     """
-    Endpoint to add new config to the dashboard.
+    Endpoint to fetch all groups.
+    """
+    return jsonify({'status': 'success', 'groups': [group.to_dict() for group in group_service.get_groups()]})
+
+
+@app.route('/groups', methods=['POST'])
+def add_group() -> Response:
+    """
+    Endpoint to add a new group.
+    Returns error if group with name already exists or folder not found.
+
+    :return: Response with new list of groups.
+    """
+    data = json.loads(request.json)
+    name = data['name']
+    folder_path = data['folder_path']
+
+    try:
+        groups = group_service.add_group(name, folder_path)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+
+    return jsonify({'status': 'success', 'groups': [group.to_dict() for group in groups]})
+
+
+@app.route('/groups', methods=['DELETE'])
+def delete_group() -> Response:
+    """
+    Endpoint to delete a group by name.
+
+    :return: Response with new list of groups.
+    """
+    group_name = request.form['group_name']
+
+    try:
+        return jsonify({'status': 'success', 'groups': [group.to_dict() for group in group_service.delete_group(group_name)]})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+
+
+@app.route('/panels', methods=['GET'])
+def get_panels() -> Response:
+    """
+    Endpoint to get all panel configs from the dashboard.
+
+    :return: JSON response with all configs
+    """
+    return jsonify({'status': 'success', 'panels': [panel.to_dict() for panel in panel_service.get_panels()]})
+
+
+@app.route('/panels', methods=['POST'])
+def add_panel() -> Response:
+    """
+    Endpoint to add new panel config to the dashboard.
 
     :return: JSON response with new configs list
     """
     data = json.loads(request.json)
     name = data['name']
-    groups = [Group(group['name'], group['folder_path']) for group in data['groups']]
+    group_names = data['group_names']
     measurement_types = [MeasurementType(int(measurement_type)) for measurement_type in data['measurement_types']]
     experiment_type = ExperimentType(int(data['experiment_type']))
-    new_config = VisualizationConfig(name, groups, measurement_types, experiment_type)
-    global configs
-    configs = configs + [new_config]
 
-    return jsonify({'status': 'success', 'configs': [c.to_dict() for c in configs]})
+    try:
+        return jsonify({'status': 'success', 'panels': [panel.to_dict() for panel in panel_service.add_panel(name, group_names, measurement_types, experiment_type)]})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
 
 
-@app.route('/delete_config', methods=['POST'])
-def delete_config() -> Response:
+@app.route('/panels', methods=['DELETE'])
+def delete_panel() -> Response:
     """
-    Endpoint to delete a config from the dashboard.
+    Endpoint to delete a panel config from the dashboard.
 
     :return: JSON response with new configs
     """
-    config_name = request.form['name']
-    global configs
-    configs = [c for c in configs if c.name != config_name]
-    return jsonify({'status': 'success', 'configs': [c.to_dict() for c in configs]})
+    panel_name = request.form['name']
+
+    try:
+        return jsonify({'status': 'success', 'panels': [panel.to_dict() for panel in panel_service.delete_panel(panel_name)]})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
 
 
-@app.route('/generate_visualizations')
+@app.route('/visualizations/generate')
 def generate_visualizations() -> Response:
     """
     Endpoint to generate visualizations (and grafana dashboard configuration).
@@ -87,38 +126,10 @@ def generate_visualizations() -> Response:
 
     :return: JSON response with redirect
     """
-    # Generate and save json file which configures Grafana dashboard.
-    grafana_config = generate_dashboard(configs)
-    dir_name = os.path.dirname(DASHBOARD_CONFIG_PATH)
-
-    if not os.path.exists(dir_name):
-        os.makedirs(dir_name)
-    with open(DASHBOARD_CONFIG_PATH, 'w') as json_file:
-        json.dump(grafana_config, json_file, indent=4)  # `indent=4` for pretty formatting
+    panel_configs = panel_service.get_panels()
+    grafana_visualization_service.configure(panel_configs)
 
     return redirect(GRAFANA_URL)
-
-
-@app.route('/get_configs', methods=['GET'])
-def get_configs() -> Response:
-    """
-    Endpoint to get all configs from the dashboard.
-
-    :return: JSON response with all configs
-    """
-    return jsonify([c.to_dict() for c in configs])
-
-
-@app.route('/process', methods=['POST'])
-def process() -> Response:
-    """
-    # TODO what does this do?
-    """
-    data = request.get_json()
-    df = pd.DataFrame(data)
-    # Perform preprocessing here
-    result = df.describe().to_dict()
-    return jsonify(result)
 
 
 def main() -> None:
