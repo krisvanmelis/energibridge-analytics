@@ -20,20 +20,23 @@ import os
 class Group:
     name: str
     trials: List[Trial]
+    output_folder = 'csv-data/output/'  # always this folder
 
     # Aggregated data from all trails (e.g. mean, median, std over time)
+    aggregate_data_path: str
     aggregate_data: pd.DataFrame
 
     # Summary statistics for the whole group (e.g. total energy, peak power)
-    statistics_summary: pd.DataFrame
+    summary_path: str
+    summary: pd.DataFrame
 
-    def __init__(self, name: str, folder_path: str, output_folder='') -> None:
+    def __init__(self, name: str, folder_path: str ) -> None:
         if not os.path.exists(folder_path):
             raise FileNotFoundError(f'Group folder {folder_path} does not exist.')
 
         self.name = name
 
-        output_folder_path = os.path.join(output_folder, name)
+        output_folder_path = os.path.join(self.output_folder, name)
         if not os.path.exists(output_folder_path):
             os.makedirs(output_folder_path)
 
@@ -45,10 +48,10 @@ class Group:
         self.aggregate()
         self.summarize()
 
-    def aggregate(self) -> str:
+    def aggregate(self) -> None:
         """
                 Aggregate the data from all trails in the group for the specified columns
-                TODO: good aggregation with interpolation for differing deltas
+                TODO: aggregation with interpolation for differing deltas
                 TODO: outlier detection? -> flag possible?
                 :return filepath to the aggregate dataframe
                 """
@@ -70,16 +73,20 @@ class Group:
 
         max_length_index = argmax([len(trial.preprocessed_data) for trial in self.trials])
         dictionary = {
-            'Time': self.trials[max_length_index].preprocessed_data['Time'],
-            'Delta': self.trials[max_length_index].preprocessed_data['Delta']
+            'Time': self.trials[max_length_index].preprocessed_data['Time'].astype(int),
+            'Delta': self.trials[max_length_index].preprocessed_data['Delta'].astype(int)
         }
         for c in columns:
+            if c in ['Time', 'Delta']:
+                continue
             dictionary[f'{c}_mean'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].mean(axis=1)
             dictionary[f'{c}_std'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].std(axis=1)
             dictionary[f'{c}_median'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].median(axis=1)
             dictionary[f'{c}_min'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].min(axis=1)
             dictionary[f'{c}_max'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].max(axis=1)
         self.aggregate_data = pd.DataFrame(dictionary)
+        self.aggregate_data_path = os.path.join(os.path.join(self.output_folder, self.name), 'aggregate_data.csv')
+        self.aggregate_data.to_csv(self.aggregate_data_path, index=False)
 
     def summarize(self) -> None:
         """
@@ -90,7 +97,6 @@ class Group:
         - average peak power overall (Row)
         - TODO: normal tests? (for energy consumption, peak power, etc.)
         """
-        # TODO: Add summary statistics logic here for all trails as whole --- columns??
         summary = pd.DataFrame(columns=['Trial name', 'Total Energy (J)', 'Peak Power (W)', 'Median Power (W)']).set_index('Trial name')
         for trial in self.trials:
             row = [
@@ -109,7 +115,9 @@ class Group:
             summary['Peak Power (W)'].median(),
             summary['Median Power (W)'].median()
         ]
-        self.statistics_summary = summary
+        self.summary = summary
+        self.summary_path = os.path.join(os.path.join(self.output_folder, self.name), 'summary.csv')
+        self.summary.to_csv(self.summary_path, index=True)
 
     def visualize(self, measurement_types: List[MeasurementType], visualization_type: VisualizationType) -> dict:
         """
@@ -131,9 +139,9 @@ class Group:
         if self.aggregate_data is not None:
             print("Aggregate Data:")
             print(self.aggregate_data)
-        if self.statistics_summary is not None:
+        if self.summary is not None:
             print("Statistics Summary:")
-            print(self.statistics_summary)
+            print(self.summary)
 
 
     def to_dict(self) -> dict:

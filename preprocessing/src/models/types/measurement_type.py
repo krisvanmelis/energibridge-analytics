@@ -19,15 +19,16 @@ class MeasurementType(Enum):
     TODO: make numbers a list of possible interesting columns and make the parsing in respective functions check for existence
     """
     ALL = 0
-    SYSTEM_POWER = 1
-    CPU_ENERGY = 2
-    CPU_POWER = 3
+    SYSTEM_ENERGY = 1
+    SYSTEM_POWER = 2
+    CPU_ENERGY = 3
+    CPU_POWER = 4
 
-    POWER_PER_CORE = 4
-    ENERGY_PER_CORE = 5
-    VOLTAGE_PER_CORE = 6
-    FREQUENCIES = 7
-    USAGES_PER_LOGICAL_PROCESSOR = 8
+    POWER_PER_CORE = 5
+    ENERGY_PER_CORE = 6
+    VOLTAGE_PER_CORE = 7
+    FREQUENCIES = 8
+    USAGES_PER_LOGICAL_PROCESSOR = 9
     MEMORY = 10
     TEMPERATURE = 11
     GPU_METRICS = 12

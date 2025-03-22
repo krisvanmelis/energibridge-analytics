@@ -22,7 +22,7 @@ def measurement_type_to_column(measurement_type: MeasurementType) -> dict:
     """
     predefined_columns = {
         MeasurementType.SYSTEM_ENERGY: {
-            "selector": "SYSTEM_ENERGY (J)",
+            "selector": "SYSTEM_ENERGY (J)_mean",
             "text": "SYSTEM_ENERGY (J)",
             "type": "number",
         },
@@ -53,7 +53,7 @@ def generate_target_from_group(group: Group, columns: List[dict]) -> dict:
         "root_selector": "",
         "source": "url",
         "type": "csv",
-        "url": f"http://nginx/{group.trials[0].preprocessed_file_path}",
+        "url": f"http://nginx/{group.aggregate_data_path}",
         # TODO Single CSV containing aggregated group results
         "url_options": {
             "data": "",

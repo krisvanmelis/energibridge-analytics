@@ -9,8 +9,9 @@ document.getElementById('group-form').addEventListener('submit', function(e) {
         body: JSON.stringify(JSON.stringify({ name: groupName, folder_path: folderPath })),
     }).then(response => response.json())
         .then(data => {
-            updateGroupTable(data.groups)
-            updateGroupsInPanelForm(data.groups)
+            console.log(data);
+            updateGroupTable(data.groups);
+            updateGroupsInPanelForm(data.groups);
         });
 });
 

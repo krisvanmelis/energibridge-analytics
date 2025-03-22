@@ -110,7 +110,7 @@
                             "type": "timestamp_epoch"
                         },
                         {
-                            "selector": "SYSTEM_ENERGY (J)",
+                            "selector": "SYSTEM_ENERGY (J)_mean",
                             "text": "SYSTEM_ENERGY (J)",
                             "type": "number"
                         }
@@ -123,196 +123,18 @@
                     "format": "table",
                     "global_query_id": "",
                     "parser": "backend",
-                    "refId": "g1",
+                    "refId": "group1",
                     "root_selector": "",
                     "source": "url",
                     "type": "csv",
-                    "url": "http://nginx/csv-data/preprocessing_output/large_specific_extensions_0_processed_preprocessed_preprocessed_preprocessed_preprocessed_preprocessed.csv",
-                    "url_options": {
-                        "data": "",
-                        "method": "GET"
-                    }
-                },
-                {
-                    "columns": [
-                        {
-                            "selector": "Time",
-                            "text": "Time",
-                            "type": "timestamp_epoch"
-                        },
-                        {
-                            "selector": "SYSTEM_ENERGY (J)",
-                            "text": "SYSTEM_ENERGY (J)",
-                            "type": "number"
-                        }
-                    ],
-                    "datasource": {
-                        "type": "yesoreyeram-infinity-datasource",
-                        "uid": "PEB6B42F54C42D283"
-                    },
-                    "filters": [],
-                    "format": "table",
-                    "global_query_id": "",
-                    "parser": "backend",
-                    "refId": "g2",
-                    "root_selector": "",
-                    "source": "url",
-                    "type": "csv",
-                    "url": "http://nginx/csv-data/preprocessing_output/large_specific_extensions_0_processed_preprocessed_preprocessed_preprocessed_preprocessed_preprocessed_preprocessed.csv",
+                    "url": "http://nginx/csv-data/output/group1/aggregate_data.csv",
                     "url_options": {
                         "data": "",
                         "method": "GET"
                     }
                 }
             ],
-            "title": "v1",
-            "type": "timeseries"
-        },
-        {
-            "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "PEB6B42F54C42D283"
-            },
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisBorderShow": false,
-                        "axisCenteredZero": false,
-                        "axisColorMode": "text",
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "barAlignment": 0,
-                        "barWidthFactor": 0.6,
-                        "drawStyle": "line",
-                        "fillOpacity": 0,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "insertNulls": false,
-                        "lineInterpolation": "linear",
-                        "lineWidth": 1,
-                        "pointSize": 5,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "showPoints": "always",
-                        "spanNulls": false,
-                        "stacking": {
-                            "group": "A",
-                            "mode": "none"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "decimals": 2,
-                    "fieldMinMax": false,
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            }
-                        ]
-                    },
-                    "unit": "joule"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 9,
-                "w": 24,
-                "x": 0,
-                "y": 0
-            },
-            "id": 1,
-            "options": {
-                "legend": {
-                    "calcs": [],
-                    "displayMode": "list",
-                    "placement": "bottom",
-                    "showLegend": true
-                },
-                "tooltip": {
-                    "hideZeros": false,
-                    "mode": "single",
-                    "sort": "none"
-                }
-            },
-            "pluginVersion": "11.5.2",
-            "targets": [
-                {
-                    "columns": [
-                        {
-                            "selector": "Time",
-                            "text": "Time",
-                            "type": "timestamp_epoch"
-                        },
-                        {
-                            "selector": "SYSTEM_ENERGY (J)",
-                            "text": "SYSTEM_ENERGY (J)",
-                            "type": "number"
-                        }
-                    ],
-                    "datasource": {
-                        "type": "yesoreyeram-infinity-datasource",
-                        "uid": "PEB6B42F54C42D283"
-                    },
-                    "filters": [],
-                    "format": "table",
-                    "global_query_id": "",
-                    "parser": "backend",
-                    "refId": "g1",
-                    "root_selector": "",
-                    "source": "url",
-                    "type": "csv",
-                    "url": "http://nginx/csv-data/preprocessing_output/large_specific_extensions_0_processed_preprocessed_preprocessed_preprocessed_preprocessed_preprocessed.csv",
-                    "url_options": {
-                        "data": "",
-                        "method": "GET"
-                    }
-                },
-                {
-                    "columns": [
-                        {
-                            "selector": "Time",
-                            "text": "Time",
-                            "type": "timestamp_epoch"
-                        },
-                        {
-                            "selector": "SYSTEM_ENERGY (J)",
-                            "text": "SYSTEM_ENERGY (J)",
-                            "type": "number"
-                        }
-                    ],
-                    "datasource": {
-                        "type": "yesoreyeram-infinity-datasource",
-                        "uid": "PEB6B42F54C42D283"
-                    },
-                    "filters": [],
-                    "format": "table",
-                    "global_query_id": "",
-                    "parser": "backend",
-                    "refId": "g2",
-                    "root_selector": "",
-                    "source": "url",
-                    "type": "csv",
-                    "url": "http://nginx/csv-data/preprocessing_output/large_specific_extensions_0_processed_preprocessed_preprocessed_preprocessed_preprocessed_preprocessed_preprocessed.csv",
-                    "url_options": {
-                        "data": "",
-                        "method": "GET"
-                    }
-                }
-            ],
-            "title": "v2",
+            "title": "abc",
             "type": "timeseries"
         }
     ],
