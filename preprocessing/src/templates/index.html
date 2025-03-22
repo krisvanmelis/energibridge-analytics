@@ -20,7 +20,7 @@
                 <input type="text" id="group-name" name="name" required>
 
                 <label for="folder-path">Folder Path:</label>
-                <input type="file" id="folder-path" name="folder_path" required>
+                <input type="text" id="folder-path" name="folder_path">
 
                 <button type="submit">Add Experiment Group</button>
             </form>
@@ -39,17 +39,21 @@
 
                 <label for="experiment-type">Experiment Type:</label>
                 <select id="experiment-type" name="experiment_type" required>
-                    <option value="1">Type 1</option>
-                    <option value="2">Type 2</option>
+                    <option value="1">Difference</option>
+                    <option value="2">Significance Test</option>
                 </select>
 
                 <label>Measurement Types:</label>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="measurement1" name="measurement_types" value="1">
-                    <label for="measurement1">Measurement 1</label>
+                <div class="checkbox-container">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="measurement1" name="measurement_types" value="1">
+                        <label for="measurement1">System Energy</label>
+                    </div>
 
-                    <input type="checkbox" id="measurement2" name="measurement_types" value="2">
-                    <label for="measurement2">Measurement 2</label>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="measurement2" name="measurement_types" value="2">
+                        <label for="measurement2">CPU Power</label>
+                    </div>
                 </div>
 
                 <button type="submit">Add Visualization Panel</button>
@@ -62,7 +66,7 @@
                 <thead>
                     <tr>
                         <th>Group Name</th>
-                        <th>Folder Path</th>
+                        <th>Trial Count</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,6 +80,7 @@
                         <th>Panel Name</th>
                         <th>Experiment Type</th>
                         <th>Measurement Types</th>
+                        <th>Groups</th>
                     </tr>
                 </thead>
                 <tbody>

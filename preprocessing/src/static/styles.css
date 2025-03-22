@@ -83,3 +83,20 @@ th {
     background-color: #3a7d44;
     color: #ffffff;
 }
+
+.checkbox-container {
+    display: flex;
+    flex-direction: column; /* Stack checkboxes vertically */
+    gap: 10px; /* Add spacing between checkboxes */
+    padding: 10px 0; /* Consistent padding for spacing */
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Spacing between checkbox and label */
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: auto; /* Prevents checkboxes from stretching */
+}

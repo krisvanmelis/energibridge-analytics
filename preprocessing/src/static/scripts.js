@@ -6,9 +6,12 @@ document.getElementById('group-form').addEventListener('submit', function(e) {
     fetch('/groups', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: groupName, folder_path: folderPath })
+        body: JSON.stringify(JSON.stringify({ name: groupName, folder_path: folderPath })),
     }).then(response => response.json())
-      .then(data => updateTable('group-table', data.groups));
+        .then(data => {
+            updateGroupTable(data.groups)
+            updateGroupsInPanelForm(data.groups)
+        });
 });
 
 document.getElementById('panel-form').addEventListener('submit', function(e) {
@@ -23,14 +26,18 @@ document.getElementById('panel-form').addEventListener('submit', function(e) {
     fetch('/panels', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: JSON.stringify(JSON.stringify({
             name: panelName,
             group_names: groupNames,
             experiment_type: experimentType,
             measurement_types: measurementTypes
-        })
+        }))
     }).then(response => response.json())
-      .then(data => updateTable('panel-table', data.panels));
+        .then(response => {
+            console.log(response)
+            return response
+        })
+      .then(data => updatePanelTable(data.panels));
 });
 
 document.getElementById('generate-visualizations').addEventListener('click', function() {
@@ -49,5 +56,50 @@ function updateTable(tableId, data) {
             row.appendChild(cell);
         }
         tableBody.appendChild(row);
+    });
+}
+
+function updateGroupTable(groups) {
+    const tableBody = document.getElementById('group-table').querySelector('tbody');
+    tableBody.innerHTML = '';
+    groups.forEach(item => {
+        const row = document.createElement('tr');
+        for (const value of Object.values(item)) {
+            const cell = document.createElement('td');
+            cell.textContent = value;
+            row.appendChild(cell);
+        }
+        tableBody.appendChild(row);
+    });
+}
+
+function updatePanelTable(panels) {
+    const tableBody = document.getElementById('panel-table').querySelector('tbody');
+    tableBody.innerHTML = '';
+    panels.forEach(panel => {
+        const row = document.createElement('tr');
+        for (const key_name of ['name', 'experiment_type', 'measurement_types', 'group_names']) {
+            const cell = document.createElement('td');
+            console.log(panel);
+            console.log(key_name);
+            cell.innerHTML = panel[key_name];
+            row.appendChild(cell);
+        }
+        tableBody.appendChild(row);
+    });
+}
+
+function updateGroupsInPanelForm(groups) {
+    const selectElement = document.getElementById('groups');
+
+    // Clear existing options
+    selectElement.innerHTML = '';
+
+    // Add new options
+    groups.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group.name;
+        option.textContent = group.name;
+        selectElement.appendChild(option);
     });
 }

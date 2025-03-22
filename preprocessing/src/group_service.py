@@ -13,12 +13,7 @@ class GroupService:
     _groups: List[Group]
 
     def __init__(self):
-        self._groups = [
-            Group(
-                name="sample visualization",
-                folder_path="csv-data/preprocessing_output",
-            )
-        ]
+        self._groups = []
 
     def find_group(self, group_name: str) -> Optional[Group]:
         """

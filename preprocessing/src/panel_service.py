@@ -18,17 +18,7 @@ class PanelService:
 
     def __init__(self, group_service: GroupService):
         self._group_service = group_service
-        groups = self._group_service.get_groups()
-        # Sample list to store configurations
-        # TODO start with empty list of groups
-        self._panel_configs = [
-            PanelConfig(
-                name="sample visualization",
-                groups=groups,
-                measurement_types=[MeasurementType.SYSTEM_ENERGY],
-                experiment_type=ExperimentType.DIFFERENCE,
-            ),
-        ]
+        self._panel_configs = []
 
     def get_panels(self) -> List[PanelConfig]:
         """

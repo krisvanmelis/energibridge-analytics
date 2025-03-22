@@ -1,7 +1,19 @@
+from typing import List, Any
+
 from models.experiment import Experiment
 from models.group import Group
 from models.types.measurement_type import MeasurementType
 from models.types.experiment_type import ExperimentType
+
+
+def _format_list(array: List[str]) -> str:
+    """
+    Format a list of strings as a single string.
+
+    :param array: List of strings.
+    :return: Formatted string.
+    """
+    return array[0] + "".join([f", {s}" for s in array[1:]])
 
 
 class PanelConfig:
@@ -24,4 +36,10 @@ class PanelConfig:
 
         :return: Dictionary representation of panel configuration.
         """
-        return {'name': self.name, 'groups': [{'name': group.name} for group in self.experiment.groups]}
+        return {
+            'name': self.name,
+            'experiment_type': str(self.experiment.experiment_type),
+            'measurement_types': _format_list([str(measurement_type) for measurement_type in self.experiment.measurement_types]),
+            'group_names': _format_list([group.name for group in self.experiment.groups])
+        }
+
