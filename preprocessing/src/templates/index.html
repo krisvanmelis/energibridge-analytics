@@ -8,46 +8,88 @@
     <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
 </head>
 <body>
-    <h1>Energibridge Visualization Generator</h1>
-    <h2>Visualization Configurations</h2>
-    <table border="1">
-        <tr>
-            <th>Name</th>
-            <th>Groups</th>
-            <th>Actions</th>
-        </tr>
-        {% for config in configs %}
-        <tr>
-            <td>{{ config.name }}</td>
-            <td>
-                <ul>
-                    {% for group in config.groups %}
-                    <li>{{ group.name }})</li>
-                    {% endfor %}
-                </ul>
-            </td>
-            <td><button onclick="deleteConfig('{{ config.name }}')">Delete</button></td>
-        </tr>
-        {% endfor %}
-    </table>
+    <header>
+        <h1>Energibridge Visualizations</h1>
+    </header>
 
-    <h2>Add Configuration</h2>
-    <form onsubmit="event.preventDefault(); addConfig();">
-        <label>Configuration Name: <input type="text" id="name" required></label>
-        <label>Experiment Type:</label>
-        <select id="experiment_type" required>
-            <option value=1>Difference</option>
-            <option value=2>Significance Test</option>
-        </select>
-        <label>Measurement Types:</label>
-        <label><input type="checkbox" class="measurement-type" value=1> System Energy</label>
-        <label><input type="checkbox" class="measurement-type" value=2> CPU Power</label>
-        <div id="groups-container"></div>
-        <button type="button" onclick="addGroupField()">Add Group</button>
-        <br><br>
-        <button type="submit">Add Configuration</button>
-    </form>
+    <main>
+        <section class="form-section">
+            <h2>Experiment Groups</h2>
+            <form id="group-form">
+                <label for="group-name">Name:</label>
+                <input type="text" id="group-name" name="name" required>
 
-    <button id="generate-btn" onclick="window.location.href='/generate_visualizations'">Generate Visualizations</button>
+                <label for="folder-path">Folder Path:</label>
+                <input type="text" id="folder-path" name="folder_path">
+
+                <button type="submit">Add Experiment Group</button>
+            </form>
+
+            <h2>Visualization Panels</h2>
+            <form id="panel-form">
+                <label for="panel-name">Name:</label>
+                <input type="text" id="panel-name" name="name" required>
+
+                <label for="groups">Groups:</label>
+                <select id="groups" multiple>
+                   <!-- Data filled dynamically -->
+                </select>
+
+                <div id="selected-groups" class="selected-items"></div>
+
+                <label for="experiment-type">Experiment Type:</label>
+                <select id="experiment-type" name="experiment_type" required>
+                    <option value="1">Difference</option>
+                    <option value="2">Significance Test</option>
+                </select>
+
+                <label>Measurement Types:</label>
+                <div class="checkbox-container">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="measurement1" name="measurement_types" value="1">
+                        <label for="measurement1">System Energy</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="measurement2" name="measurement_types" value="2">
+                        <label for="measurement2">CPU Power</label>
+                    </div>
+                </div>
+
+                <button type="submit">Add Visualization Panel</button>
+            </form>
+        </section>
+
+        <section class="data-section">
+            <h2>Data Overview</h2>
+            <table id="group-table">
+                <thead>
+                    <tr>
+                        <th>Group Name</th>
+                        <th>Trial Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be dynamically added here -->
+                </tbody>
+            </table>
+
+            <table id="panel-table">
+                <thead>
+                    <tr>
+                        <th>Panel Name</th>
+                        <th>Experiment Type</th>
+                        <th>Measurement Types</th>
+                        <th>Groups</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be dynamically added here -->
+                </tbody>
+            </table>
+
+            <button id="generate-visualizations" onclick="window.location.href='/visualizations/generate'">Generate Visualizations</button>
+        </section>
+    </main>
 </body>
 </html>
