@@ -14,11 +14,27 @@ def preprocess(raw_data: pd.DataFrame) -> pd.DataFrame:
     """
     Takes imported csv as DataFrame and do necessary preprocessing. This includes finding differences in energy and
     adding converted where necessary. Adds missing power or energy columns where necessary.
+
+    Time and delta is quantised to the most occurring delta in the data (we assume this to be the delta entered into the
+    EnergiBridge call). Because differing deltas usually differ by 1-2ms, we round the time and assume this to have
+    little effect on power and energy calculations.
+
     :param raw_data: Loaded csv as a DataFrame
     :return: Preprocessed DataFrame
     """
     # Go through all dataframe columns and preprocess where necessary
     res = raw_data.copy()
+    # Normalise time to start at 0
+    res['Time'] = res['Time'] - res['Time'].min()
+
+    # Quantisation of delta and time to become multiples of delta
+    delta = res['Delta'].mode()
+    res['Delta'] = res['Delta'].apply(lambda x: round(x / delta) * delta)
+    res['Time'] = res['Time'].apply(lambda x: round(x / delta) * delta)
+
+    # For windows, the package energy is the total energy used by the CPU
+    if 'CPU_ENERGY (J)' not in res.columns and 'PACKAGE_ENERGY (J)' in res.columns:
+        res['CPU_ENERGY (J)'] = res['PACKAGE_ENERGY (J)']
 
     # Loop through all columns in res
     for column in res.columns:
@@ -61,9 +77,12 @@ def power_preprocessing(df: pd.DataFrame, column: str) -> pd.DataFrame:
     :return: Copy of the DataFrame with the added energy column.
     """
     ndf = df.copy()
+    # Rename to have (W) instead of (Watts)
+    if column.endswith('Watts'):
+        column = column.replace('Watts', 'W')
     # Add energy column
     cat = column.split('_')[0]
-    ndf[f'{cat}_ENERGY (J)'] = (ndf[column] * (ndf['Delta']/1000)).fillna(0)
+    ndf[f'DIFF_{cat}_ENERGY (J)'] = (ndf[column] * (ndf['Delta']/1000)).fillna(0)
     return ndf
 
 # ------------------------------------------------------------------------------------------------------

@@ -22,3 +22,13 @@ volumes/
 Thumbs.db
 
 .idea/
+
+preprocessing/__pycache__/
+
+preprocessing/src/__pycache__/
+
+preprocessing/src/models/__pycache__/
+
+preprocessing/src/models/types/__pycache__/
+
+csv-data/output/

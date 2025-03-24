@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ExperimentType(Enum):
     """
     Enum to define the type of experiment.

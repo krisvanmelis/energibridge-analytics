@@ -48,6 +48,5 @@ class Experiment:
         self.analyze()
 
         # TODO: Add logic to visualize the experiment data to a panel
-        
 
 

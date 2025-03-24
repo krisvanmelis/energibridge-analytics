@@ -12,13 +12,16 @@ from panel_service import PanelService
 from grafana_visualization_service import GrafanaVisualizationService
 
 # Path where Grafana dashboard config will be saved
-DASHBOARD_CONFIG_SAVE_PATH = '../var/lib/grafana/dashboards/test_config.json'
+# DASHBOARD_CONFIG_SAVE_PATH = '../var/lib/grafana/dashboards/test_config.json'
+DASHBOARD_CONFIG_SAVE_PATH = '../var/lib/grafana/dashboards/test_config2.json'
+
 GRAFANA_URL = 'http://localhost:3000'
 
 app = Flask(__name__)
 group_service = GroupService()
 panel_service = PanelService(group_service)
 grafana_visualization_service = GrafanaVisualizationService(DASHBOARD_CONFIG_SAVE_PATH)
+
 
 @app.route('/')
 def home() -> str:
