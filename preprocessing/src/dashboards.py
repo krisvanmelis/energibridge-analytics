@@ -22,8 +22,8 @@ def measurement_type_to_column(measurement_type: MeasurementType) -> dict:
     """
     predefined_columns = {
         MeasurementType.SYSTEM_ENERGY: {
-            "selector": "SYSTEM_ENERGY (J)_mean",
-            "text": "SYSTEM_ENERGY (J)",
+            "selector": "DIFF_CPU_ENERGY (J)_mean",
+            "text": "CPU_ENERGY (J)",
             "type": "number",
         },
     }
