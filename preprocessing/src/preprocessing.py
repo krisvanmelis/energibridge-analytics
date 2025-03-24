@@ -64,7 +64,7 @@ def energy_preprocessing(df: pd.DataFrame, column: str) -> pd.DataFrame:
 
     # Add power column
     cat = column.split('_')[0]
-    ndf[f'{cat}_POWER (W)'] = (ndf[f'DIFF_{column}'] / (ndf['Delta'] / 1000)).fillna(0)
+    ndf[f'{cat}_POWER (W)'] = (ndf[f'DIFF_{column}'] / (ndf['Delta'] / 1000)).fillna(0).replace([np.inf, -np.inf], 0)
 
     return ndf
 

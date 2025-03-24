@@ -109,6 +109,9 @@ class Group:
             dictionary[f'{c}_median'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].median(axis=1)
             dictionary[f'{c}_min'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].min(axis=1)
             dictionary[f'{c}_max'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].max(axis=1)
+            dictionary[f'{c}_LQ'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].quantile(q=0.25, axis=1)
+            dictionary[f'{c}_UQ'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].quantile(q=0.75, axis=1)
+
         self.aggregate_data = pd.DataFrame(dictionary)
         self.aggregate_data_path = os.path.join(os.path.join(self.output_folder, self.name), 'aggregate_data.csv')
         self.aggregate_data.to_csv(self.aggregate_data_path, index=False)
