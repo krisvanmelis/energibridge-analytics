@@ -2,6 +2,7 @@
 Module containing a service with functionality for experiment groups.
 """
 from typing import List, Optional
+import os
 
 from models.group import Group
 
@@ -13,7 +14,13 @@ class GroupService:
     _groups: List[Group]
 
     def __init__(self):
-        self._groups = []
+        # print('Files found in export folder:', os.listdir(Group.output_folder))
+        # print(os.path.isdir(os.path.join(Group.output_folder, os.listdir(Group.output_folder)[0])))
+        print('Looking for existing groups in:', Group.output_folder)
+        self._groups = [Group(f, is_import=True)
+                        for f in os.listdir(Group.output_folder)
+                        if os.path.isdir(os.path.join(Group.output_folder, f))]
+        print('Found the following groups:', [group.name for group in self._groups])
 
     def find_group(self, group_name: str) -> Optional[Group]:
         """

@@ -56,6 +56,19 @@ document.getElementById('groups').addEventListener('change', function () {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/groups')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                updateGroupTable(data.groups);
+                updateGroupsInPanelForm(data.groups);
+            } else {
+                console.error('Failed to load groups:', data.message);
+            }
+        });
+});
+
 function updateGroupTable(groups) {
     const tableBody = document.getElementById('group-table').querySelector('tbody');
     tableBody.innerHTML = '';
