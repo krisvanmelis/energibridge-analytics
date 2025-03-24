@@ -30,23 +30,48 @@ class Group:
     summary_path: str
     summary: pd.DataFrame
 
-    def __init__(self, name: str, folder_path: str ) -> None:
-        if not os.path.exists(folder_path):
-            raise FileNotFoundError(f'Group folder {folder_path} does not exist.')
-
+    def __init__(self, name: str, folder_path: str = '', is_import: bool = False) -> None:
         self.name = name
 
-        output_folder_path = os.path.join(self.output_folder, name)
-        if not os.path.exists(output_folder_path):
-            os.makedirs(output_folder_path)
+        if not is_import:
+            if not os.path.exists(folder_path):
+                raise FileNotFoundError(f'Group folder {folder_path} does not exist.')
 
-        self.trials = [Trial(os.path.join(folder_path, file_name), os.path.join(output_folder_path, file_name))
-                       for file_name in os.listdir(folder_path) if file_name.endswith(".csv")]
-        if len(self.trials) == 0:
-            raise FileNotFoundError(f'No trials found in folder: "{folder_path}"')
+            # check and create output folder for group
+            output_folder_path = os.path.join(self.output_folder, name)
+            if not os.path.exists(output_folder_path):
+                os.makedirs(output_folder_path)
 
-        self.aggregate()
-        self.summarize()
+            # preprocess all trials in input folder and save them to output folder
+            self.trials = [Trial(os.path.join(folder_path, file_name), os.path.join(output_folder_path, file_name))
+                           for file_name in os.listdir(folder_path) if file_name.endswith(".csv")]
+            if len(self.trials) == 0:
+                raise FileNotFoundError(f'No trials found in folder: "{folder_path}"')
+            # aggregate and summarize the group
+            self.aggregate()
+            self.summarize()
+        else:
+            # for importing existing groups from the output folder.
+            group_folder_path = os.path.join(self.output_folder, name)
+
+            # find all trial csvs in folder, identified by the ending of the filename
+            self.trials = [Trial(preprocessed_path=os.path.join(group_folder_path, f))
+                           for f in os.listdir(group_folder_path)
+                           if f.endswith("_preprocessed.csv")]
+
+            if len(self.trials) == 0:
+                raise FileNotFoundError(f'No trials found in folder: "{group_folder_path}"')
+
+            # Check if the aggregate data and summary statistics are already present, load if yes, create if no.
+            if os.path.join(group_folder_path, 'aggregate_data.csv') in os.listdir(group_folder_path):
+                self.aggregate_data = pd.read_csv(os.path.join(group_folder_path, 'aggregate_data.csv'))
+            else:
+                self.aggregate()
+            if os.path.join(group_folder_path, 'summary.csv') in os.listdir(group_folder_path):
+                self.summary = pd.read_csv(os.path.join(group_folder_path, 'summary.csv'))
+            else:
+                self.summarize()
+
 
     def aggregate(self) -> None:
         """
@@ -69,7 +94,7 @@ class Group:
 
         # flatten the multiindex to a dataframe by renaming columns to '{trial name}_{column id}'
         ndf.columns = [f'{trial}:{column}' for trial, column in ndf.columns.to_flat_index()]
-        print(ndf.columns)
+        # print(ndf.columns)
 
         max_length_index = argmax([len(trial.preprocessed_data) for trial in self.trials])
         dictionary = {
@@ -84,6 +109,9 @@ class Group:
             dictionary[f'{c}_median'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].median(axis=1)
             dictionary[f'{c}_min'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].min(axis=1)
             dictionary[f'{c}_max'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].max(axis=1)
+            dictionary[f'{c}_LQ'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].quantile(q=0.25, axis=1)
+            dictionary[f'{c}_UQ'] = ndf[[f'{trial.filename}:{c}' for trial in self.trials]].quantile(q=0.75, axis=1)
+
         self.aggregate_data = pd.DataFrame(dictionary)
         self.aggregate_data_path = os.path.join(os.path.join(self.output_folder, self.name), 'aggregate_data.csv')
         self.aggregate_data.to_csv(self.aggregate_data_path, index=False)

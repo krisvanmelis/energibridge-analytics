@@ -17,15 +17,6 @@ class Experiment:
         self.experiment_type = experiment_type
         self.measurement_types = measurement_types
 
-    def add_group(self, group: Group | List[str]) -> None:
-        """
-        Add a group to the experiment.
-        """
-        if type(group) is str:
-            self.groups.append(Group(group))
-        else:
-            self.groups.append(group)
-
     def analyze(self) -> None:
         """
         Analyze the data from all groups in the experiment.
