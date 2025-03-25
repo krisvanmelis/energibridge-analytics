@@ -8,9 +8,10 @@ from models.types.measurement_type import MeasurementType
 from models.group import Group
 
 
-def measurement_type_to_column(measurement_type: MeasurementType) -> dict:
+def measurement_type_to_columns(measurement_type: MeasurementType) -> dict | [dict]:
     """
     Convert a measurement type enum to a grafana dashboard column defined as:
+    # TODO: annotated enums need to be altered to get the right no. cores
     {
         "selector": str,
         "text": str,
@@ -21,13 +22,99 @@ def measurement_type_to_column(measurement_type: MeasurementType) -> dict:
     :return: Column description as dictionary
     """
     predefined_columns = {
-        MeasurementType.SYSTEM_ENERGY: {
-            "selector": "DIFF_CPU_ENERGY (J)_mean",
+        MeasurementType.SYSTEM_POWER: [{
+            "selector": "SYSTEM_POWER (W)_median",
+            "text": "SYSTEM_POWER (W)",
+            "type": "number",
+        }, {
+            "selector": "SYSTEM_POWER (W)_LQ",
+            "text": "SYSTEM_POWER_LQ (W)",
+            "type": "number",
+        }, {
+            "selector": "SYSTEM_POWER (W)_UQ",
+            "text": "SYSTEM_POWER_UQ (W)",
+            "type": "number",
+        }],
+        MeasurementType.SYSTEM_ENERGY: [{
+            "selector": "DIFF_SYSTEM_ENERGY (J)_median",
+            "text": "SYSTEM_ENERGY (J)",
+            "type": "number",
+        }],
+        MeasurementType.CPU_ENERGY: [{
+            "selector": "DIFF_CPU_ENERGY (J)_median",
             "text": "CPU_ENERGY (J)",
             "type": "number",
-        },
+        }],
+        MeasurementType.CPU_POWER: [{
+            "selector": "CPU_POWER (W)_median",
+            "text": "CPU_POWER (W)",
+            "type": "number",
+        }, {
+            "selector": "CPU_POWER (W)_LQ",
+            "text": "CPU_POWER_LQ (W)",
+            "type": "number",
+        }, {
+            "selector": "CPU_POWER (W)_UQ",
+            "text": "CPU_POWER_UQ (W)",
+            "type": "number",
+        }],
+        MeasurementType.POWER_PER_CORE: [{  # TODO: make this generate the right columns (varies per setup)
+            "selector": "CORE0_POWER (W)_median",
+            "text": "CORE0_POWER (W)",
+            "type": "number",
+        }],
+        MeasurementType.ENERGY_PER_CORE: [{  # TODO: make this generate the right columns (varies per setup)
+            "selector": "CORE0_ENERGY (J)_median",
+            "text": "CORE0_ENERGY (J)",
+            "type": "number",
+        }],
+        MeasurementType.VOLTAGE_PER_CORE: [{  # TODO: make this generate the right columns (varies per setup)
+            "selector": "CORE0_VOLT (V)_median",
+            "text": "CORE0_VOLT (V)",
+            "type": "number",
+        }],
+        MeasurementType.FREQUENCIES: [{  # TODO: make this generate the right columns (varies per setup)
+            "selector": "CPU_FREQUENCY_0_median",
+            "text": "CPU_FREQUENCY_0",
+            "type": "number",
+        }, {  # TODO: make this generate the right columns (varies per setup)
+            "selector": "CORE0_FREQUENCY_median",
+            "text": "CORE0_FREQUENCY",
+            "type": "number",
+        }],
+        MeasurementType.USAGES_PER_LOGICAL_PROCESSOR: [{  # TODO: make this generate the right columns (varies per setup)
+            "selector": "CPU_USAGE_0_median",
+            "text": "CPU_USAGE_0",
+            "type": "number",
+        }],
+        MeasurementType.MEMORY: [{
+            "selector": "TOTAL_MEMORY_median",
+            "text": "TOTAL_MEMORY",
+            "type": "number",
+        }, {
+            "selector": "TOTAL_SWAP_median",
+            "text": "TOTAL_SWAP",
+            "type": "number",
+        }, {
+            "selector": "USED_MEMORY_median",
+            "text": "USED_MEMORY",
+            "type": "number",
+        }, {
+            "selector": "USED_SWAP_median",
+            "text": "USED_SWAP",
+            "type": "number",
+        }],
+        MeasurementType.TEMPERATURE: [{  # TODO: make this generate the right columns (varies per setup)
+            "selector": "CPU_TEMP_0_median",
+            "text": "CPU_TEMP_0",
+            "type": "number",
+        }],
+        MeasurementType.GPU_METRICS: [{  # TODO: make this generate the right columns (varies per setup)
+            "selector": "GPU0_median",
+            "text": "GPU0",
+            "type": "number",
+        }],
     }
-
     return predefined_columns[measurement_type]
 
 
@@ -76,8 +163,8 @@ def generate_panel_from_config(config: PanelConfig) -> dict:
             "type": "timestamp_epoch",
         },
     ]
-    columns = columns + [measurement_type_to_column(measurement_type) for measurement_type in
-                         config.experiment.measurement_types]
+    columns = columns + [c for c in [measurement_type_to_columns(measurement_type)
+                         for measurement_type in config.experiment.measurement_types]]
     targets = [generate_target_from_group(group, columns) for group in config.experiment.groups]
 
     return {
