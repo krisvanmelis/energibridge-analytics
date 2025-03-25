@@ -1,121 +1,135 @@
 """
 Module containing functionality for Grafana dashboards.
 """
+from dataclasses import dataclass
 from typing import List
 
 from models.panel_config import PanelConfig
 from models.types.measurement_type import MeasurementType
 from models.group import Group
 
-
-def measurement_type_to_columns(measurement_type: MeasurementType, no_cores: int, no_logical: int) -> [dict]:
+@dataclass
+class PrimaryColumn:
     """
-    Convert a measurement type enum to a grafana dashboard column defined as:
+    A primary column will result in a single panel
+    """
+    selector: str
+    text: str
+    type: str
+    unit: str
+    quantiles: bool
+
+    def to_targets(self):
+        cols = [
+            {
+                "selector": "Time",
+                "text": "Time",  # TODO add unit
+                "type": "number",
+            },
+            {
+                "selector": self.selector,
+                "text": self.text + f" ({self.unit})",
+                "type": self.type,
+            }
+        ]
+
+        if self.quantiles:
+            cols.append({
+                "selector": self.selector.replace("median", "LQ"),
+                "text": self.text + " LQ",
+                "type": self.type,
+            })
+            cols.append({
+                "selector": self.selector.replace("median", "UQ"),
+                "text": self.text + " UQ",
+                "type": self.type,
+            })
+
+# Predefined primary columns
+SYSTEM_POWER_COLUMN = PrimaryColumn("SYSTEM_POWER (W)_median", "SYSTEM_POWER", "W", "number", True)
+SYSTEM_ENERGY_COLUMN = PrimaryColumn("DIFF_SYSTEM_ENERGY (J)_median", "SYSTEM_ENERGY", "J", "number", False) # TODO change to true when supported
+CPU_ENERGY_COLUMN = PrimaryColumn("DIFF_CPU_ENERGY (J)_median", "CPU_ENERGY", "J", "number", False) # TODO change to true when supported
+CPU_POWER_COLUMN = PrimaryColumn("CPU_POWER (W)_median", "CPU_POWER", "W", "number", True)
+TOTAL_MEMORY_COLUMN = PrimaryColumn("TOTAL_MEMORY_median", "TOTAL_MEMORY", "GB", "number", False) # TODO change to true when supported
+
+def measurement_type_to_targets(measurement_type: MeasurementType, no_cores: int, no_logical: int) -> [dict]:
+    """
+    Convert a measurement type enum to grafana dashboard columns defined as:
     # TODO: annotated enums need to be altered to get the right no. cores
     {
         "selector": str,
         "text": str,
         "type": str,
     }
+    Where each column will be a target within a panel
 
     :param measurement_type: MeasurementType enum
     :return: Column description as dictionary
     """
     predefined_columns = {
-        MeasurementType.SYSTEM_POWER: [{
-            "selector": "SYSTEM_POWER (W)_median",
-            "text": "SYSTEM_POWER (W)",
-            "type": "number",
-        }, {
-            "selector": "SYSTEM_POWER (W)_LQ",
-            "text": "SYSTEM_POWER_LQ (W)",
-            "type": "number",
-        }, {
-            "selector": "SYSTEM_POWER (W)_UQ",
-            "text": "SYSTEM_POWER_UQ (W)",
-            "type": "number",
-        }],
-        MeasurementType.SYSTEM_ENERGY: [{
-            "selector": "DIFF_SYSTEM_ENERGY (J)_median",
-            "text": "SYSTEM_ENERGY (J)",
-            "type": "number",
-        }],
-        MeasurementType.CPU_ENERGY: [{
-            "selector": "DIFF_CPU_ENERGY (J)_median",
-            "text": "CPU_ENERGY (J)",
-            "type": "number",
-        }],
-        MeasurementType.CPU_POWER: [{
-            "selector": "CPU_POWER (W)_median",
-            "text": "CPU_POWER (W)",
-            "type": "number",
-        }, {
-            "selector": "CPU_POWER (W)_LQ",
-            "text": "CPU_POWER_LQ (W)",
-            "type": "number",
-        }, {
-            "selector": "CPU_POWER (W)_UQ",
-            "text": "CPU_POWER_UQ (W)",
-            "type": "number",
-        }],
-        MeasurementType.POWER_PER_CORE: [{
-            "selector": f"CORE{i}_POWER (W)_median",
-            "text": f"CORE{i}_POWER (W)",
-            "type": "number",
-        } for i in range(no_cores)],
-        MeasurementType.ENERGY_PER_CORE: [{
-            "selector": f"CORE{i}_ENERGY (J)_median",
-            "text": f"CORE{i}_ENERGY (J)",
-            "type": "number",
-        } for i in range(no_cores)],
-        MeasurementType.VOLTAGE_PER_CORE: [{
-            "selector": f"CORE{i}_VOLT (V)_median",
-            "text": f"CORE{i}_VOLT (V)",
-            "type": "number",
-        } for i in range(no_cores)],
-        MeasurementType.FREQUENCIES: [{
-            "selector": "CPU_FREQUENCY_0_median",
-            "text": "CPU_FREQUENCY_0",
-            "type": "number",
-        }, [{
-            "selector": f"CORE{i}_FREQUENCY_median",
-            "text": f"CORE{i}_FREQUENCY",
-            "type": "number",
-        } for i in range(no_cores)]],
-        MeasurementType.USAGES_PER_LOGICAL_PROCESSOR: [{
-            "selector": f"CPU_USAGE_{i}_median",
-            "text": f"CPU_USAGE_{i}",
-            "type": "number",
-        } for i in range(no_logical)],
-        MeasurementType.MEMORY: [{
-            "selector": "TOTAL_MEMORY_median",
-            "text": "TOTAL_MEMORY",
-            "type": "number",
-        }, {
-            "selector": "TOTAL_SWAP_median",
-            "text": "TOTAL_SWAP",
-            "type": "number",
-        }, {
-            "selector": "USED_MEMORY_median",
-            "text": "USED_MEMORY",
-            "type": "number",
-        }, {
-            "selector": "USED_SWAP_median",
-            "text": "USED_SWAP",
-            "type": "number",
-        }],
-        MeasurementType.TEMPERATURE: [{
-            "selector": f"CPU_TEMP_{i}_median",
-            "text": f"CPU_TEMP_{i}",
-            "type": "number",
-        } for i in range(no_logical)],
-        MeasurementType.GPU_METRICS: [{  # TODO: make this generate the right columns (varies per setup)
-            "selector": "GPU0_median",
-            "text": "GPU0",
-            "type": "number",
-        }],
+        MeasurementType.SYSTEM_POWER: SYSTEM_POWER_COLUMN,
+        MeasurementType.SYSTEM_ENERGY: SYSTEM_ENERGY_COLUMN,
+        MeasurementType.CPU_ENERGY: CPU_ENERGY_COLUMN,
+        MeasurementType.CPU_POWER: CPU_POWER_COLUMN,
+        # MeasurementType.POWER_PER_CORE: [{
+        #     "selector": f"CORE{i}_POWER (W)_median",
+        #     "text": f"CORE{i}_POWER (W)",
+        #     "type": "number",
+        # } for i in range(no_cores)],
+        # MeasurementType.ENERGY_PER_CORE: [{
+        #     "selector": f"CORE{i}_ENERGY (J)_median",
+        #     "text": f"CORE{i}_ENERGY (J)",
+        #     "type": "number",
+        # } for i in range(no_cores)],
+        # MeasurementType.VOLTAGE_PER_CORE: [{
+        #     "selector": f"CORE{i}_VOLT (V)_median",
+        #     "text": f"CORE{i}_VOLT (V)",
+        #     "type": "number",
+        # } for i in range(no_cores)],
+        # MeasurementType.FREQUENCIES: [{
+        #     "selector": "CPU_FREQUENCY_0_median",
+        #     "text": "CPU_FREQUENCY_0",
+        #     "type": "number",
+        # }, [{
+        #     "selector": f"CORE{i}_FREQUENCY_median",
+        #     "text": f"CORE{i}_FREQUENCY",
+        #     "type": "number",
+        # } for i in range(no_cores)]],
+        # MeasurementType.USAGES_PER_LOGICAL_PROCESSOR: [{
+        #     "selector": f"CPU_USAGE_{i}_median",
+        #     "text": f"CPU_USAGE_{i}",
+        #     "type": "number",
+        # } for i in range(no_logical)],
+        # MeasurementType.MEMORY: [{
+        #     "selector": "TOTAL_MEMORY_median",
+        #     "text": "TOTAL_MEMORY",
+        #     "type": "number",
+        # }, {
+        #     "selector": "TOTAL_SWAP_median",
+        #     "text": "TOTAL_SWAP",
+        #     "type": "number", TODO fix the commented out ones that depend on cores/logical
+        # }, {
+        #     "selector": "USED_MEMORY_median",
+        #     "text": "USED_MEMORY",
+        #     "type": "number",
+        # }, {
+        #     "selector": "USED_SWAP_median",
+        #     "text": "USED_SWAP",
+        #     "type": "number",
+        # }],
+        MeasurementType.MEMORY: TOTAL_MEMORY_COLUMN,
+        # MeasurementType.TEMPERATURE: [{
+        #     "selector": f"CPU_TEMP_{i}_median",
+        #     "text": f"CPU_TEMP_{i}",
+        #     "type": "number",
+        # } for i in range(no_logical)],
+        # MeasurementType.GPU_METRICS: [{  # TODO: make this generate the right columns (varies per setup)
+        #     "selector": "GPU0_median",
+        #     "text": "GPU0",
+        #     "type": "number",
+        # }],
     }
-    return predefined_columns[measurement_type]
+    return predefined_columns[measurement_type].to_targets()
 
 
 def generate_target_from_group(group: Group, columns: List[dict]) -> dict:
@@ -141,7 +155,6 @@ def generate_target_from_group(group: Group, columns: List[dict]) -> dict:
         "source": "url",
         "type": "csv",
         "url": f"http://nginx/{group.aggregate_data_path}",
-        # TODO Single CSV containing aggregated group results
         "url_options": {
             "data": "",
             "method": "GET"
@@ -149,114 +162,118 @@ def generate_target_from_group(group: Group, columns: List[dict]) -> dict:
     }
 
 
-def generate_panel_from_config(config: PanelConfig) -> dict:
+def generate_panels_from_config(config: PanelConfig) -> [dict]:
     """
     Generate a dashboard panel configuration based on visualization config.
 
     :param config: VisualizationConfig describing experiment and how it should be visualized.
     :return: Dashboard panel configuration as a dictionary.
     """
-    columns = [
-        {
-            "selector": "Time",
-            "text": "Time",
-            "type": "number",
-        },
-    ]
-    columns = columns + [c for c in [measurement_type_to_columns(  # TODO: stores nested here which messes it up >> unnesting didn't work :(
-                            measurement_type,
-                            config.experiment.groups[0].no_cores,
-                            config.experiment.groups[0].no_logical)
-                         for measurement_type in config.experiment.measurement_types]]
+    panels = []
+    for measurement_type in config.experiment.measurement_types:
+        columns = [
+            {
+                "selector": "Time",
+                "text": "Time",
+                "type": "number",
+            },
+        ]
+        columns = columns + [c for c in [measurement_type_to_columns(  # TODO: stores nested here which messes it up >> unnesting didn't work :(
+                                measurement_type,
+                                config.experiment.groups[0].no_cores,
+                                config.experiment.groups[0].no_logical)
+                             for measurement_type in config.experiment.measurement_types]]
 
-    print(f'Columns wanted from config: {columns}')
+        print(f'Columns wanted from config: {columns}')
 
-    targets = [generate_target_from_group(group, columns) for group in config.experiment.groups]
+        targets = [generate_target_from_group(group, columns) for group in config.experiment.groups]
 
-    return {
-        "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "PEB6B42F54C42D283"
-        },
-        "fieldConfig": {
-            "defaults": {
-                "color": {
-                    "mode": "palette-classic"
-                },
-                "custom": {
-                    "axisBorderShow": False,
-                    "axisCenteredZero": False,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 0,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                        "legend": False,
-                        "tooltip": False,
-                        "viz": False
+        panel = {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
                     },
-                    "insertNulls": False,
-                    "lineInterpolation": "linear",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                        "type": "linear"
-                    },
-                    "showPoints": "always",
-                    "spanNulls": False,
-                    "stacking": {
-                        "group": "A",
-                        "mode": "none"
-                    },
-                    "thresholdsStyle": {
-                        "mode": "off"
-                    }
-                },
-                "decimals": 2,
-                "fieldMinMax": False,
-                "mappings": [],
-                "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                        {
-                            "color": "green",
-                            "value": None
+                    "custom": {
+                        "axisBorderShow": False,
+                        "axisCenteredZero": False,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "barWidthFactor": 0.6,
+                        "drawStyle": "line",
+                        "fillOpacity": 0,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": False,
+                            "tooltip": False,
+                            "viz": False
+                        },
+                        "insertNulls": False,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "always",
+                        "spanNulls": False,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
                         }
-                    ]
+                    },
+                    "decimals": 2,
+                    "fieldMinMax": False,
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": None
+                            }
+                        ]
+                    },
+                    "unit": "joule"
                 },
-                "unit": "joule"
+                "overrides": []
             },
-            "overrides": []
-        },
-        "gridPos": {
-            "h": 9,
-            "w": 24,
-            "x": 0,
-            "y": 0
-        },
-        "id": 1,
-        "options": {
-            "legend": {
-                "calcs": [],
-                "displayMode": "list",
-                "placement": "bottom",
-                "showLegend": True
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 0
             },
-            "tooltip": {
-                "hideZeros": False,
-                "mode": "single",
-                "sort": "none"
-            }
-        },
-        "pluginVersion": "11.5.2",
-        "targets": targets,
-        "title": config.name,
-        "type": "timeseries"  # TODO support for non time series?
-    }
+            "id": 1,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": True
+                },
+                "tooltip": {
+                    "hideZeros": False,
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "11.5.2",
+            "targets": targets,
+            "title": config.name,
+            "type": "timeseries"  # TODO support for non time series?
+        }
+        panels.append(panel)
+    return panels
 
 
 def generate_dashboard(configs: List[PanelConfig]) -> dict:
