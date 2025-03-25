@@ -22,6 +22,10 @@ class Group:
     trials: List[Trial]
     output_folder = 'csv-data/output/'  # always this folder
 
+    # Number of cores and logical processors (easier for exporting to Grafana)
+    no_cores: int
+    no_logical: int
+
     # Aggregated data from all trails (e.g. mean, median, std over time)
     aggregate_data_path: str
     aggregate_data: pd.DataFrame
@@ -71,6 +75,9 @@ class Group:
                 self.summary = pd.read_csv(os.path.join(group_folder_path, 'summary.csv'))
             else:
                 self.summarize()
+
+        self.no_cores = self.trials[0].no_cores()
+        self.no_logical = self.trials[0].no_logical()
 
 
     def aggregate(self) -> None:

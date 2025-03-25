@@ -8,7 +8,7 @@ from models.types.measurement_type import MeasurementType
 from models.group import Group
 
 
-def measurement_type_to_columns(measurement_type: MeasurementType) -> dict | [dict]:
+def measurement_type_to_columns(measurement_type: MeasurementType, no_cores: int, no_logical: int) -> [dict]:
     """
     Convert a measurement type enum to a grafana dashboard column defined as:
     # TODO: annotated enums need to be altered to get the right no. cores
@@ -58,35 +58,35 @@ def measurement_type_to_columns(measurement_type: MeasurementType) -> dict | [di
             "text": "CPU_POWER_UQ (W)",
             "type": "number",
         }],
-        MeasurementType.POWER_PER_CORE: [{  # TODO: make this generate the right columns (varies per setup)
-            "selector": "CORE0_POWER (W)_median",
-            "text": "CORE0_POWER (W)",
+        MeasurementType.POWER_PER_CORE: [{
+            "selector": f"CORE{i}_POWER (W)_median",
+            "text": f"CORE{i}_POWER (W)",
             "type": "number",
-        }],
-        MeasurementType.ENERGY_PER_CORE: [{  # TODO: make this generate the right columns (varies per setup)
-            "selector": "CORE0_ENERGY (J)_median",
-            "text": "CORE0_ENERGY (J)",
+        } for i in range(no_cores)],
+        MeasurementType.ENERGY_PER_CORE: [{
+            "selector": f"CORE{i}_ENERGY (J)_median",
+            "text": f"CORE{i}_ENERGY (J)",
             "type": "number",
-        }],
-        MeasurementType.VOLTAGE_PER_CORE: [{  # TODO: make this generate the right columns (varies per setup)
-            "selector": "CORE0_VOLT (V)_median",
-            "text": "CORE0_VOLT (V)",
+        } for i in range(no_cores)],
+        MeasurementType.VOLTAGE_PER_CORE: [{
+            "selector": f"CORE{i}_VOLT (V)_median",
+            "text": f"CORE{i}_VOLT (V)",
             "type": "number",
-        }],
-        MeasurementType.FREQUENCIES: [{  # TODO: make this generate the right columns (varies per setup)
+        } for i in range(no_cores)],
+        MeasurementType.FREQUENCIES: [{
             "selector": "CPU_FREQUENCY_0_median",
             "text": "CPU_FREQUENCY_0",
             "type": "number",
-        }, {  # TODO: make this generate the right columns (varies per setup)
-            "selector": "CORE0_FREQUENCY_median",
-            "text": "CORE0_FREQUENCY",
+        }, [{
+            "selector": f"CORE{i}_FREQUENCY_median",
+            "text": f"CORE{i}_FREQUENCY",
             "type": "number",
-        }],
-        MeasurementType.USAGES_PER_LOGICAL_PROCESSOR: [{  # TODO: make this generate the right columns (varies per setup)
-            "selector": "CPU_USAGE_0_median",
-            "text": "CPU_USAGE_0",
+        } for i in range(no_cores)]],
+        MeasurementType.USAGES_PER_LOGICAL_PROCESSOR: [{
+            "selector": f"CPU_USAGE_{i}_median",
+            "text": f"CPU_USAGE_{i}",
             "type": "number",
-        }],
+        } for i in range(no_logical)],
         MeasurementType.MEMORY: [{
             "selector": "TOTAL_MEMORY_median",
             "text": "TOTAL_MEMORY",
@@ -104,11 +104,11 @@ def measurement_type_to_columns(measurement_type: MeasurementType) -> dict | [di
             "text": "USED_SWAP",
             "type": "number",
         }],
-        MeasurementType.TEMPERATURE: [{  # TODO: make this generate the right columns (varies per setup)
-            "selector": "CPU_TEMP_0_median",
-            "text": "CPU_TEMP_0",
+        MeasurementType.TEMPERATURE: [{
+            "selector": f"CPU_TEMP_{i}_median",
+            "text": f"CPU_TEMP_{i}",
             "type": "number",
-        }],
+        } for i in range(no_logical)],
         MeasurementType.GPU_METRICS: [{  # TODO: make this generate the right columns (varies per setup)
             "selector": "GPU0_median",
             "text": "GPU0",
@@ -160,11 +160,17 @@ def generate_panel_from_config(config: PanelConfig) -> dict:
         {
             "selector": "Time",
             "text": "Time",
-            "type": "timestamp_epoch",
+            "type": "number",
         },
     ]
-    columns = columns + [c for c in [measurement_type_to_columns(measurement_type)
+    columns = columns + [c for c in [measurement_type_to_columns(  # TODO: stores nested here which messes it up >> unnesting didn't work :(
+                            measurement_type,
+                            config.experiment.groups[0].no_cores,
+                            config.experiment.groups[0].no_logical)
                          for measurement_type in config.experiment.measurement_types]]
+
+    print(f'Columns wanted from config: {columns}')
+
     targets = [generate_target_from_group(group, columns) for group in config.experiment.groups]
 
     return {

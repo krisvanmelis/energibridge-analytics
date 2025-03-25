@@ -21,6 +21,7 @@ class GroupService:
                         for f in os.listdir(Group.output_folder)
                         if os.path.isdir(os.path.join(Group.output_folder, f))]
         print('Found the following groups:', [group.name for group in self._groups])
+        print(f'No. cores found in first group: {str(self._groups[0].no_cores)}')
 
     def find_group(self, group_name: str) -> Optional[Group]:
         """

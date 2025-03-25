@@ -86,6 +86,13 @@ th {
 
 .checkbox-container {
     display: flex;
+    flex-wrap: wrap;
+    flex-direction: row; /* Align columns horizontally */
+}
+
+.checkbox-column {
+    flex: 1;
+    min-width: 50%;
     flex-direction: column; /* Stack checkboxes vertically */
     gap: 10px; /* Add spacing between checkboxes */
     padding: 10px 0; /* Consistent padding for spacing */

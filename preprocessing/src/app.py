@@ -13,7 +13,7 @@ from grafana_visualization_service import GrafanaVisualizationService
 
 # Path where Grafana dashboard config will be saved
 # DASHBOARD_CONFIG_SAVE_PATH = '../var/lib/grafana/dashboards/test_config.json'
-DASHBOARD_CONFIG_SAVE_PATH = '../var/lib/grafana/dashboards/test_config2.json'
+DASHBOARD_CONFIG_SAVE_PATH = '../var/lib/grafana/dashboards/test_config3.json'
 
 GRAFANA_URL = 'http://localhost:3000'
 
@@ -129,6 +129,8 @@ def generate_visualizations() -> Response:
     :return: JSON response with redirect
     """
     panel_configs = panel_service.get_panels()
+    app.logger.info(f'Following config asked for: {panel_configs}')
+
     grafana_visualization_service.configure(panel_configs)
 
     return redirect(GRAFANA_URL)
