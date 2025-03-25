@@ -23,6 +23,10 @@ Thumbs.db
 
 .idea/
 
+preprocessing/__pycache__
+preprocessing/__pycache__/*
+*/__pycache__/
+
 preprocessing/__pycache__/
 
 preprocessing/src/__pycache__/

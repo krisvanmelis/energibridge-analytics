@@ -18,8 +18,8 @@ document.getElementById('group-form').addEventListener('submit', function(e) {
 document.getElementById('panel-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const panelName = document.getElementById('panel-name').value;
-    const groupNames = Array.from(document.getElementById('groups').selectedOptions)
-                           .map(option => option.value);
+    const groupNames = Array.from(document.querySelectorAll('.item.selected'))
+                                  .map(item => item.textContent);
     const experimentType = document.getElementById('experiment-type').value;
     const measurementTypes = Array.from(document.querySelectorAll('input[name="measurement_types"]:checked'))
                                  .map(cb => cb.value);
@@ -39,21 +39,6 @@ document.getElementById('panel-form').addEventListener('submit', function(e) {
             return response
         })
       .then(data => updatePanelTable(data.panels));
-});
-
-document.getElementById('groups').addEventListener('change', function () {
-    const selectedGroups = Array.from(this.selectedOptions).map(option => option.text);
-    const selectedDisplay = document.getElementById('selected-groups');
-
-    // Clear previous selections
-    selectedDisplay.innerHTML = '';
-
-    // Add selected items as badges
-    selectedGroups.forEach(group => {
-        const span = document.createElement('span');
-        span.textContent = group;
-        selectedDisplay.appendChild(span);
-    });
 });
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -90,8 +75,6 @@ function updatePanelTable(panels) {
         const row = document.createElement('tr');
         for (const key_name of ['name', 'experiment_type', 'measurement_types', 'group_names']) {
             const cell = document.createElement('td');
-            console.log(panel);
-            console.log(key_name);
             cell.innerHTML = panel[key_name];
             row.appendChild(cell);
         }
@@ -107,9 +90,12 @@ function updateGroupsInPanelForm(groups) {
 
     // Add new options
     groups.forEach(group => {
-        const option = document.createElement('option');
-        option.value = group.name;
-        option.textContent = group.name;
-        selectElement.appendChild(option);
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.textContent = group.name;
+        item.addEventListener('click', () => {
+            item.classList.toggle('selected');
+        });
+        selectElement.appendChild(item);
     });
 }

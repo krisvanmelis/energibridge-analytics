@@ -136,3 +136,25 @@ th {
     border-radius: 12px;
     font-size: 0.9rem;
 }
+
+.group-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    min-height: 100px;
+    align-items: start;
+}
+.item {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    height: 30px;
+    margin-top: 5px;
+}
+.item.selected {
+    background-color: #4CAF50;
+    color: #fff;
+}
