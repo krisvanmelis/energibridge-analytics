@@ -13,8 +13,8 @@ class PrimaryColumn:
     """
     selector: str
     text: str
-    type: str
     unit: str
+    type: str
     quantiles: bool
 
     def to_cols_dicts(self):
@@ -116,10 +116,10 @@ class PrimaryColumn:
 
 # Predefined primary columns
 SYSTEM_POWER_COLUMN = PrimaryColumn("SYSTEM_POWER (W)_median", "SYSTEM_POWER", "W", "number", True)
-SYSTEM_ENERGY_COLUMN = PrimaryColumn("DIFF_SYSTEM_ENERGY (J)_median", "SYSTEM_ENERGY", "J", "number", False) # TODO change to true when supported
-CPU_ENERGY_COLUMN = PrimaryColumn("DIFF_CPU_ENERGY (J)_median", "CPU_ENERGY", "J", "number", False) # TODO change to true when supported
+SYSTEM_ENERGY_COLUMN = PrimaryColumn("DIFF_SYSTEM_ENERGY (J)_median", "SYSTEM_ENERGY", "J", "number", True)
+CPU_ENERGY_COLUMN = PrimaryColumn("DIFF_CPU_ENERGY (J)_median", "CPU_ENERGY", "J", "number", True)
 CPU_POWER_COLUMN = PrimaryColumn("CPU_POWER (W)_median", "CPU_POWER", "W", "number", True)
-TOTAL_MEMORY_COLUMN = PrimaryColumn("TOTAL_MEMORY_median", "TOTAL_MEMORY", "GB", "number", False) # TODO change to true when supported
+TOTAL_MEMORY_COLUMN = PrimaryColumn("TOTAL_MEMORY_median", "TOTAL_MEMORY", "GB", "number", True)
 
 def measurement_type_to_panel(config: PanelConfig, measurement_type: MeasurementType, groups: List[Group]) -> dict:
     targets = []
@@ -216,7 +216,7 @@ def measurement_type_to_panel(config: PanelConfig, measurement_type: Measurement
             "pluginVersion": "11.5.2",
             "targets": targets,
             "title": config.name,
-            "type": "timeseries"  # TODO support for non time series?
+            "type": "trend"
         }
 
 def generate_panels_from_config(config: PanelConfig) -> List[dict]:
