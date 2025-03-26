@@ -3,6 +3,7 @@ from typing import List
 from models.group import Group
 from models.panel_config import PanelConfig
 from models.types.measurement_type import MeasurementType
+from models.types.grafana_panel import GrafanaPanel
 
 
 # TODO make sure all columns above appear in aggregated.csv
@@ -112,8 +113,11 @@ def generate_dashboard_v2(configs: List[PanelConfig]) -> dict:
     """
     panels = []
     for config in configs:
-        for panel in generate_panels_from_config(config):
-            panels.append(panel)
+        # PanelConfig(panel_name, groups, measurement_types, experiment_type)
+        for mt in config.experiment.measurement_types:
+            panels.append(GrafanaPanel(config.name, mt, config.experiment.groups).to_dict())
+        # for panel in generate_panels_from_config(config):
+        #     panels.append(panel)
 
     return {
         "annotations": {
