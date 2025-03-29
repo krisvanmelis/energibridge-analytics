@@ -1,21 +1,13 @@
-document.getElementById('group-form').addEventListener('submit', function(e) {
+document.getElementById('group-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const groupName = document.getElementById('group-name').value;
     const folderPath = document.getElementById('folder-path').value;
 
-    fetch('/groups', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(JSON.stringify({ name: groupName, folder_path: folderPath })),
-    }).then(response => response.json())
-        .then(data => {
-            console.log(data);
-            updateGroupTable(data.groups);
-            updateGroupsInPanelForm(data.groups);
-        });
+    await addGroup(groupName, folderPath);
+    await syncGroups();
 });
 
-document.getElementById('panel-form').addEventListener('submit', function(e) {
+document.getElementById('panel-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const panelName = document.getElementById('panel-name').value;
     const groupNames = Array.from(document.querySelectorAll('.item.selected'))
@@ -24,21 +16,8 @@ document.getElementById('panel-form').addEventListener('submit', function(e) {
     const measurementTypes = Array.from(document.querySelectorAll('input[name="measurement_types"]:checked'))
                                  .map(cb => cb.value);
 
-    fetch('/panels', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(JSON.stringify({
-            name: panelName,
-            group_names: groupNames,
-            experiment_type: experimentType,
-            measurement_types: measurementTypes
-        }))
-    }).then(response => response.json())
-        .then(response => {
-            console.log(response)
-            return response
-        })
-      .then(data => updatePanelTable(data.panels));
+    await addPanel(panelName, groupNames, experimentType, measurementTypes);
+    await syncPanels();
 });
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -64,6 +43,16 @@ function updateGroupTable(groups) {
             cell.textContent = value;
             row.appendChild(cell);
         }
+        const deleteButton = document.createElement('button');
+        const groupName = Object.values(item)[0];
+        deleteButton.innerText = 'Delete Group';
+        deleteButton.onclick = async () => {
+            await deleteGroup(groupName);
+            await syncGroups();
+        }
+        const deleteCell = document.createElement('td');
+        deleteCell.appendChild(deleteButton);
+        row.appendChild(deleteCell)
         tableBody.appendChild(row);
     });
 }
@@ -78,6 +67,16 @@ function updatePanelTable(panels) {
             cell.innerHTML = panel[key_name];
             row.appendChild(cell);
         }
+        const deleteButton = document.createElement('button');
+        const panelName = Object.values(panel)[0];
+        deleteButton.innerText = 'Delete Panel';
+        deleteButton.onclick = async () => {
+            await deletePanel(panelName);
+            await syncPanels();
+        }
+        const deleteCell = document.createElement('td');
+        deleteCell.appendChild(deleteButton);
+        row.appendChild(deleteCell)
         tableBody.appendChild(row);
     });
 }
@@ -98,4 +97,68 @@ function updateGroupsInPanelForm(groups) {
         });
         selectElement.appendChild(item);
     });
+}
+
+async function fetchGroups() {
+    return await fetch('/groups')
+        .then(response => response.json())
+}
+
+async function addGroup(name, folder_path) {
+    return await fetch('/groups', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(JSON.stringify({ name, folder_path })),
+    })
+        .then(response => response.json())
+}
+
+async function deleteGroup(name) {
+    return await fetch('/groups', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+    })
+        .then(response => response.json())
+}
+
+async function syncGroups() {
+    const response = await fetchGroups();
+
+    updateGroupTable(response.groups);
+    updateGroupsInPanelForm(response.groups);
+}
+
+async function fetchPanels() {
+    return await fetch('/panels')
+        .then(response => response.json())
+}
+
+async function addPanel(name, group_names, experiment_type, measurement_types) {
+    return await fetch('/panels', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(JSON.stringify({
+            name,
+            group_names,
+            experiment_type,
+            measurement_types,
+        }))
+    })
+        .then(response => response.json())
+}
+
+async function deletePanel(name) {
+    return await fetch('/panels', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+    })
+        .then(response => response.json())
+}
+
+async function syncPanels() {
+    const response = await fetchPanels();
+
+    updatePanelTable(response.panels);
 }

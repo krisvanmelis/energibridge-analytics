@@ -2,6 +2,7 @@
 Module containing Flask application for generating grafana dashboard configurations.
 """
 import json
+import logging
 
 from flask import Flask, jsonify, request, render_template, redirect, Response
 
@@ -68,7 +69,8 @@ def delete_group() -> Response:
 
     :return: Response with new list of groups.
     """
-    group_name = request.form['group_name']
+    request_json = request.get_json()
+    group_name = request_json['name']
 
     try:
         return jsonify({'status': 'success', 'groups': [group.to_dict() for group in group_service.delete_group(group_name)]})
@@ -76,7 +78,7 @@ def delete_group() -> Response:
         return jsonify({'status': 'error', 'message': str(e)})
 
 
-@app.route('/panels', methods=['GET'])
+@app.route('/panels')
 def get_panels() -> Response:
     """
     Endpoint to get all panel configs from the dashboard.
@@ -112,7 +114,8 @@ def delete_panel() -> Response:
 
     :return: JSON response with new configs
     """
-    panel_name = request.form['name']
+    request_json = request.get_json()
+    panel_name = request_json['name']
 
     try:
         return jsonify({'status': 'success', 'panels': [panel.to_dict() for panel in panel_service.delete_panel(panel_name)]})
@@ -141,6 +144,10 @@ def main() -> None:
     Main function, entrypoint of Flask app.
     """
     app.run(host='0.0.0.0', port=5001)
+
+    # Configure logging
+    logging.basicConfig(level=logging.DEBUG,  # Log all levels (DEBUG, INFO, etc.)
+                        format='%(asctime)s [%(levelname)s] %(message)s')
 
 
 if __name__ == '__main__':

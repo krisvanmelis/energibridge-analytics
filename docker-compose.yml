@@ -45,8 +45,9 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     ports:
       - "5001:5001"
-#    depends_on:
-#      - postgres
+    environment:
+      - FLASK_ENV=development
+      - PYTHONUNBUFFERED=1  # Ensures output appears in real-time in the logs
 
 volumes:
   postgres-data:

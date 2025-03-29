@@ -67,8 +67,11 @@ class GroupService:
         :param group_name: Name of group
         :return: New list of Groups
         """
-        if self.find_group(group_name) is None:
+        group = self.find_group(group_name)
+        if group is None:
             raise ValueError(f'Group with name "{group_name}" does not exist.')
+
+        group.delete_data_from_disk()
 
         self._groups = [group for group in self._groups if group.name.lower() != group_name.lower()]
         return self._groups

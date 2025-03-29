@@ -1,4 +1,5 @@
 import re
+import shutil
 from re import match
 
 import pandas as pd
@@ -178,9 +179,15 @@ class Group:
             print("Statistics Summary:")
             print(self.summary)
 
-
     def to_dict(self) -> dict:
         """
         Convert group to dictionary parseable by frontend.
         """
         return {'name': self.name, 'trial_count': str(len(self.trials))}
+
+    def delete_data_from_disk(self):
+        """
+        Delete processed data from disk.
+        """
+        group_path = os.path.join(self.output_folder, self.name)
+        shutil.rmtree(group_path)
