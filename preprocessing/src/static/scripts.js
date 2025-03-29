@@ -1,12 +1,15 @@
+// Adding a group
 document.getElementById('group-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const groupName = document.getElementById('group-name').value;
     const folderPath = document.getElementById('folder-path').value;
 
-    await addGroup(groupName, folderPath);
-    await syncGroups();
+    await addGroup(groupName, folderPath).then(async () =>
+        await syncGroups()
+    );
 });
 
+// Adding a panel
 document.getElementById('panel-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const panelName = document.getElementById('panel-name').value;
@@ -20,19 +23,17 @@ document.getElementById('panel-form').addEventListener('submit', async function(
     await syncPanels();
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('/groups')
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                updateGroupTable(data.groups);
-                updateGroupsInPanelForm(data.groups);
-            } else {
-                console.error('Failed to load groups:', data.message);
-            }
-        });
+// Refreshing the page
+document.addEventListener('DOMContentLoaded', async function() {
+    await syncGroups();
+    await syncPanels()
 });
 
+/**
+ * Update the groups in the groups table.
+ *
+ * @param groups - The groups to use to fill the table.
+ */
 function updateGroupTable(groups) {
     const tableBody = document.getElementById('group-table').querySelector('tbody');
     tableBody.innerHTML = '';
@@ -57,6 +58,11 @@ function updateGroupTable(groups) {
     });
 }
 
+/**
+ * Update list of panels in panel table.
+ *
+ * @param panels - Panels to use to fill the table
+ */
 function updatePanelTable(panels) {
     const tableBody = document.getElementById('panel-table').querySelector('tbody');
     tableBody.innerHTML = '';
@@ -68,7 +74,8 @@ function updatePanelTable(panels) {
             row.appendChild(cell);
         }
         const deleteButton = document.createElement('button');
-        const panelName = Object.values(panel)[0];
+        const values = Object.values(panel);
+        const panelName = values[values.length - 1];  // For some reason the panel name is the last value instead of the first
         deleteButton.innerText = 'Delete Panel';
         deleteButton.onclick = async () => {
             await deletePanel(panelName);
@@ -81,6 +88,11 @@ function updatePanelTable(panels) {
     });
 }
 
+/**
+ * Update the groups to choose from in the panel form.
+ *
+ * @param groups - Groups to use as data
+ */
 function updateGroupsInPanelForm(groups) {
     const selectElement = document.getElementById('groups');
 
@@ -99,43 +111,80 @@ function updateGroupsInPanelForm(groups) {
     });
 }
 
+/**
+ * Fetch all groups.
+ *
+ * @returns Response containing list of all groups or null
+ */
 async function fetchGroups() {
-    return await fetch('/groups')
-        .then(response => response.json())
+    return await executeRequest('groups', {
+        method: 'GET',
+    });
 }
 
+/**
+ * Add a group.
+ *
+ * @param name - Name of the group
+ * @param folder_path - Path to folder containing data for experiment groups (csv files)
+ * @returns Response containing list of new groups or null
+ */
 async function addGroup(name, folder_path) {
-    return await fetch('/groups', {
+    return await executeRequest('/groups', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(JSON.stringify({ name, folder_path })),
-    })
-        .then(response => response.json())
+        body: JSON.stringify({ name, folder_path }),
+    });
 }
 
+/**
+ * Delete a group by name.
+ *
+ * @param name - Group name
+ * @returns Response containing list of new groups or null
+ */
 async function deleteGroup(name) {
-    return await fetch('/groups', {
+    return await executeRequest('/groups', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
-    })
-        .then(response => response.json())
+    });
 }
 
+/**
+ * Sync all groups on screen with BE.
+ */
 async function syncGroups() {
-    const response = await fetchGroups();
-
-    updateGroupTable(response.groups);
-    updateGroupsInPanelForm(response.groups);
+    await fetchGroups().then(response => {
+        if (response) {
+            updateGroupTable(response.groups);
+            updateGroupsInPanelForm(response.groups);
+        }
+    });
 }
 
+/**
+ * Fetch all current panels.
+ *
+ * @returns Response containing list of all panels or null.
+ */
 async function fetchPanels() {
-    return await fetch('/panels')
-        .then(response => response.json())
+    return await executeRequest('/panels', {
+        method: 'GET',
+    });
 }
 
+/**
+ * Add a panel.
+ *
+ * @param name - Name of the panel
+ * @param group_names - Experiment group names
+ * @param experiment_type - Experiment type TODO remove
+ * @param measurement_types - Measurement types
+ * @returns Response containing new panels or null
+ */
 async function addPanel(name, group_names, experiment_type, measurement_types) {
-    return await fetch('/panels', {
+    return await executeRequest('/panels', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(JSON.stringify({
@@ -144,21 +193,49 @@ async function addPanel(name, group_names, experiment_type, measurement_types) {
             experiment_type,
             measurement_types,
         }))
-    })
-        .then(response => response.json())
+    });
 }
 
+/**
+ * Delete a panel by name.
+ *
+ * @param name - Name of the panel
+ * @returns Response containing new panels or null
+ */
 async function deletePanel(name) {
-    return await fetch('/panels', {
+    return await executeRequest('/panels', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
-    })
-        .then(response => response.json())
+    });
 }
 
+/**
+ * Sync panels on screen with BE.
+ */
 async function syncPanels() {
     const response = await fetchPanels();
+    if (response) {
+        updatePanelTable(response.panels);
+    }
+}
 
-    updatePanelTable(response.panels);
+/**
+ * Execute an HTTP request and display error if it fails.
+ *
+ * @param url - URL to make request to
+ * @param config - Request configuration (same as fetch api)
+ * @returns Response or null on error
+ */
+async function executeRequest(url, config) {
+    return await fetch(url, config).then(async (response) => {
+        const json = await response.json();
+
+        // Alert on screen if request fails
+        if (json.status !== 'success') {
+            alert(json.message);
+            return null;
+        }
+        return json;
+    })
 }

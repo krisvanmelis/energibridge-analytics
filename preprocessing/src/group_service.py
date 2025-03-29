@@ -56,7 +56,7 @@ class GroupService:
             raise ValueError(f'Group with name "{group_name}" already exists.')
 
         group = Group(group_name, folder_path)
-        self._groups.append(group)
+        self._groups = self._groups + [group]
         return self._groups
 
     def delete_group(self, group_name: str) -> List[Group]:

@@ -50,16 +50,15 @@ def add_group() -> Response:
 
     :return: Response with new list of groups.
     """
-    data = json.loads(request.json)
+    data = request.get_json()
     name = data['name']
     folder_path = data['folder_path']
 
     try:
         groups = group_service.add_group(name, folder_path)
+        return jsonify({'status': 'success', 'groups': [group.to_dict() for group in groups]})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
-
-    return jsonify({'status': 'success', 'groups': [group.to_dict() for group in groups]})
 
 
 @app.route('/groups', methods=['DELETE'])
