@@ -14,13 +14,14 @@ class GroupService:
     _groups: List[Group]
 
     def __init__(self):
-        # print('Files found in export folder:', os.listdir(Group.output_folder))
-        # print(os.path.isdir(os.path.join(Group.output_folder, os.listdir(Group.output_folder)[0])))
         print('Looking for existing groups in:', Group.output_folder)
+        if not os.path.exists(Group.output_folder):
+            os.makedirs(Group.output_folder)
         self._groups = [Group(f, is_import=True)
                         for f in os.listdir(Group.output_folder)
                         if os.path.isdir(os.path.join(Group.output_folder, f))]
         print('Found the following groups:', [group.name for group in self._groups])
+        #print(f'No. cores found in first group: {str(self._groups[0].no_cores)}')
 
     def find_group(self, group_name: str) -> Optional[Group]:
         """
@@ -55,7 +56,7 @@ class GroupService:
             raise ValueError(f'Group with name "{group_name}" already exists.')
 
         group = Group(group_name, folder_path)
-        self._groups.append(group)
+        self._groups = self._groups + [group]
         return self._groups
 
     def delete_group(self, group_name: str) -> List[Group]:
@@ -66,8 +67,11 @@ class GroupService:
         :param group_name: Name of group
         :return: New list of Groups
         """
-        if self.find_group(group_name) is None:
+        group = self.find_group(group_name)
+        if group is None:
             raise ValueError(f'Group with name "{group_name}" does not exist.')
+
+        group.delete_data_from_disk()
 
         self._groups = [group for group in self._groups if group.name.lower() != group_name.lower()]
         return self._groups

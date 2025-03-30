@@ -1,17 +1,17 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: analytics
-    volumes:
-      - ./volumes/postgres-data:/var/lib/postgresql/data
-      - ./postgres-init:/docker-entrypoint-initdb.d
-    ports:
-      - "5432:5432"
+#  postgres:
+#    image: postgres:13
+#    environment:
+#      POSTGRES_USER: admin
+#      POSTGRES_PASSWORD: admin
+#      POSTGRES_DB: analytics
+#    volumes:
+#      - ./volumes/postgres-data:/var/lib/postgresql/data
+#      - ./postgres-init:/docker-entrypoint-initdb.d
+#    ports:
+#      - "5432:5432"
 
   grafana:
     image: grafana/grafana:latest
@@ -26,8 +26,8 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     ports:
       - "3000:3000"
-    depends_on:
-      - postgres
+#    depends_on:
+#      - postgres
 
   nginx:
     image: nginx:latest
@@ -45,8 +45,9 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     ports:
       - "5001:5001"
-    depends_on:
-      - postgres
+    environment:
+      - FLASK_ENV=development
+      - PYTHONUNBUFFERED=1  # Ensures output appears in real-time in the logs
 
 volumes:
   postgres-data:

@@ -1,4 +1,7 @@
+import re
+from dataclasses import dataclass
 from enum import Enum
+
 
 
 class MeasurementType(Enum):
@@ -53,6 +56,37 @@ class MeasurementType(Enum):
         }
         return dictionary[self.name]
 
+    # TODO: fix
+    def to_targets(self) -> [dict]:
+        return [{}]
+    # def to_grafana_columns(self) -> [PrimaryColumn]:
+    #     """
+    #     Convert measuremnt type to Grafana columns.
+    #
+    #     :return: List of columns
+    #     """
+    #     predefined_columns = {
+    #         MeasurementType.SYSTEM_POWER: SYSTEM_POWER_COLUMN,
+    #         MeasurementType.SYSTEM_ENERGY: SYSTEM_ENERGY_COLUMN,
+    #         MeasurementType.CPU_ENERGY: CPU_ENERGY_COLUMN,
+    #         MeasurementType.CPU_POWER: CPU_POWER_COLUMN,
+    #         MeasurementType.MEMORY: TOTAL_MEMORY_COLUMN,
+    #     }
+    #     return predefined_columns[self]
+
+    def column_names_to_targets(self, column_names: [str]) -> dict:
+        """
+        Convert column name to Grafana target.
+        """
+        regexs = self.columns()
+        targets = []
+        for r in regexs:
+            targets += [targets.append({
+                "selector": c,
+                "text": c,
+                "type": "number",
+            }) for c in column_names if re.match(r, c) != None]
+        return targets
 
     def __str__(self):
         """

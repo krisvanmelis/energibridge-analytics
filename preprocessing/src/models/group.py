@@ -1,4 +1,5 @@
 import re
+import shutil
 from re import match
 
 import pandas as pd
@@ -21,6 +22,10 @@ class Group:
     name: str
     trials: List[Trial]
     output_folder = 'csv-data/output/'  # always this folder
+
+    # Number of cores and logical processors (easier for exporting to Grafana)
+    no_cores: int
+    no_logical: int
 
     # Aggregated data from all trails (e.g. mean, median, std over time)
     aggregate_data_path: str
@@ -71,6 +76,9 @@ class Group:
                 self.summary = pd.read_csv(os.path.join(group_folder_path, 'summary.csv'))
             else:
                 self.summarize()
+
+        self.no_cores = self.trials[0].no_cores()
+        self.no_logical = self.trials[0].no_logical()
 
 
     def aggregate(self) -> None:
@@ -171,9 +179,15 @@ class Group:
             print("Statistics Summary:")
             print(self.summary)
 
-
     def to_dict(self) -> dict:
         """
         Convert group to dictionary parseable by frontend.
         """
         return {'name': self.name, 'trial_count': str(len(self.trials))}
+
+    def delete_data_from_disk(self):
+        """
+        Delete processed data from disk.
+        """
+        group_path = os.path.join(self.output_folder, self.name)
+        shutil.rmtree(group_path)

@@ -18,7 +18,7 @@ def _format_list(array: List[str]) -> str:
 
 class PanelConfig:
     """
-    Data class representing grafana panel configuration.
+    Class representing grafana panel configuration.
     """
     name: str
     experiment: Experiment
