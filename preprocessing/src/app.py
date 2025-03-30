@@ -3,6 +3,7 @@ Module containing Flask application for generating grafana dashboard configurati
 """
 import json
 import logging
+import os
 
 from flask import Flask, jsonify, request, render_template, redirect, Response
 
@@ -19,6 +20,7 @@ DASHBOARD_CONFIG_SAVE_PATH = '../var/lib/grafana/dashboards/test_config4.json'
 GRAFANA_URL = 'http://localhost:3000'
 
 app = Flask(__name__)
+app.run(use_reloader=True)
 group_service = GroupService()
 panel_service = PanelService(group_service)
 grafana_visualization_service = GrafanaVisualizationService(DASHBOARD_CONFIG_SAVE_PATH)
@@ -52,7 +54,7 @@ def add_group() -> Response:
     """
     data = json.loads(request.json)
     name = data['name']
-    folder_path = data['folder_path']
+    folder_path = 'csv-data/input/' + data['folder_path']
 
     try:
         groups = group_service.add_group(name, folder_path)
@@ -138,6 +140,15 @@ def generate_visualizations() -> Response:
 
     return redirect(GRAFANA_URL)
 
+
+@app.route('/csv-data/input/')
+def get_folder_paths() -> Response:
+    """
+    Endpoint to get all folder paths in input folder.
+    """
+    # Fetch all folders in /csv-data/input folder
+
+    return jsonify({'folders': [f for f in os.listdir('csv-data/input') if os.path.isdir(os.path.join('csv-data/input', f))]})
 
 def main() -> None:
     """

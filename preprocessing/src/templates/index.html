@@ -20,7 +20,9 @@
                 <input type="text" id="group-name" name="name" required>
 
                 <label for="folder-path">Folder Path:</label>
-                <input type="text" id="folder-path" name="folder_path">
+                <select id="folder-path" name="folder_path" required>
+                    <!-- Options will be dynamically populated -->
+                </select>
 
                 <button type="submit">Add Experiment Group</button>
             </form>
@@ -134,5 +136,23 @@
             <button id="generate-visualizations" onclick="window.location.href='/visualizations/generate'">Generate Visualizations</button>
         </section>
     </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const folderPathSelect = document.getElementById('folder-path');
+            try {
+                const response = await fetch('/csv-data/input/');
+                const data = await response.json(); // Assuming the endpoint returns a JSON array of folder names
+
+                data.folders.forEach(folder => {
+                    const option = document.createElement('option');
+                    option.value = folder;
+                    option.textContent = folder;
+                    folderPathSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching folder paths:', error);
+            }
+        });
+    </script>
 </body>
 </html>
