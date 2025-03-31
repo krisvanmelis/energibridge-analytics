@@ -1,68 +1,160 @@
+import re
 from enum import Enum
-from typing import Optional
 
 
 class MeasurementType(Enum):
-    """Enum representing the type of measurements available in the system."""
+    """
+    Enum class defining measurement types for experiments.
+    These measurement types are based on the columns available in the CSV data files.
+    Each measurement type has an associated column_name that specifies the column in the CSV file.
+    Some column names include placeholders (e.g., {core_num}) that should be replaced
+    with appropriate values when accessing the actual columns.
+    """
+    ALL = (0, "all")
     
-    # Core-specific measurements
-    CORE_ENERGY = "CORE_ENERGY (J)"
-    CORE_POWER = "CORE_POWER (W)"
-    CORE_FREQUENCY = "CORE_FREQ (MHZ)"
-    CORE_VOLTAGE = "CORE_VOLT (V)"
-    CORE_PSTATE = "CORE_PSTATE"
+    # Time-related measurements
+    TIME = (1, "Time")
+    DELTA = (2, "Delta")
     
-    # CPU-wide measurements
-    CPU_ENERGY = "CPU_ENERGY (J)"
-    CPU_POWER = "CPU_POWER (W)"
-    CPU_USAGE_LOGICAL = "CPU_USAGE"
-    CPU_FREQUENCY_LOGICAL = "CPU_FREQUENCY"
+    # System-level measurements
+    SYSTEM_ENERGY = (10, "SYSTEM_ENERGY")
+    SYSTEM_POWER = (11, "SYSTEM_POWER")
     
-    # Memory measurements
-    TOTAL_MEMORY = "TOTAL_MEMORY"
-    USED_MEMORY = "USED_MEMORY"
-    TOTAL_SWAP = "TOTAL_SWAP"
-    USED_SWAP = "USED_SWAP"
+    # CPU-level aggregated measurements
+    CPU_ENERGY = (20, "CPU_ENERGY (J)")
+    CPU_POWER = (21, "CPU_POWER (W)")
+    DIFF_CPU_ENERGY = (22, "DIFF_CPU_ENERGY (J)")
     
-    # System-wide measurements
-    SYSTEM_ENERGY = "SYSTEM_ENERGY (J)" 
-    SYSTEM_POWER = "SYSTEM_POWER (W)"
+    # Per-core energy and power measurements
+    CORE_ENERGY = (30, "CORE{core_num}_ENERGY (J)")
+    CORE_POWER = (31, "CORE{core_num}_POWER (W)")
+    DIFF_CORE_ENERGY = (32, "DIFF_CORE{core_num}_ENERGY (J)")
     
-    # Special
-    ALL = "ALL"
+    # Per-core frequency, voltage, and p-state measurements
+    CORE_FREQUENCY = (40, "CORE{core_num}_FREQ (MHZ)")
+    CORE_VOLTAGE = (41, "CORE{core_num}_VOLT (V)")
+    CORE_PSTATE = (42, "CORE{core_num}_PSTATE")
     
+    # CPU usage and frequency per logical processor
+    CPU_FREQUENCY_LOGICAL = (50, "CPU_FREQUENCY_{core_num}")
+    CPU_USAGE_LOGICAL = (51, "CPU_USAGE_{core_num}")
+    
+    # Memory metrics
+    TOTAL_MEMORY = (60, "TOTAL_MEMORY")
+    USED_MEMORY = (61, "USED_MEMORY")
+    TOTAL_SWAP = (62, "TOTAL_SWAP")
+    USED_SWAP = (63, "USED_SWAP")
+    
+    # Temperature metrics
+    TEMPERATURE = (70, "TEMPERATURE")
+    
+    # GPU metrics
+    GPU_METRICS = (80, "GPU_METRICS")
+
+    def __init__(self, value, column_name):
+        """
+        Initialize the enum with a value and column name.
+        
+        Args:
+            value: The enum value
+            column_name: The corresponding column name in CSV files (may include placeholders)
+        """
+        self._value_ = value
+        self.column_name = column_name
+
+    def __str__(self):
+        """
+        String representation of the measurement type.
+        """
+        return self.name
+        
+    @classmethod
+    def _missing_(cls, value):
+        """
+        Custom handler for missing enum values.
+        Helps with more user-friendly error messages.
+        
+        Args:
+            value: The value that was not found
+            
+        Returns:
+            None (and raises ValueError with a helpful message)
+        """
+        try:
+            # For int values, try to provide better error messages
+            if isinstance(value, int):
+                valid_values = [m.value for m in cls]
+                raise ValueError(f"{value} is not a valid {cls.__name__}. Valid values are: {valid_values}")
+            # For string values
+            elif isinstance(value, str):
+                try:
+                    # Try to convert to int first
+                    return cls(int(value))
+                except ValueError:
+                    # If that fails, try to find by name
+                    for member in cls:
+                        if member.name.lower() == value.lower():
+                            return member
+                    raise ValueError(f"'{value}' is not a valid {cls.__name__} name")
+        except Exception as e:
+            # Fallback error message
+            raise ValueError(f"Invalid {cls.__name__} value: {value}. Error: {str(e)}")
+
     @property
-    def get_column_name(self) -> str:
-        """Get the column name in the CSV file corresponding to this measurement type."""
-        return self.value
+    def get_column_name(self):
+        """
+        Get the column name associated with this measurement type.
+        
+        Returns:
+            str: The column name pattern in the CSV file
+        """
+        return self.column_name
     
-    def get_full_column_name(self, core_num: Optional[int] = None, statistic: str = "median") -> str:
+    def get_column_name_for_core(self, core_num):
         """
-        Get the full column name including core number (if applicable) and statistic.
+        Get the column name for a specific core number.
         
-        :param core_num: The core number (if applicable).
-        :param statistic: The statistic (mean, median, min, max, etc).
-        :return: The full column name.
+        Args:
+            core_num: The core number to substitute in the column name
+            
+        Returns:
+            str: The column name with the core number substituted
         """
-        base_name = self.value
-        
-        if core_num is not None:
-            if self in [MeasurementType.CORE_ENERGY, MeasurementType.CORE_POWER, 
-                       MeasurementType.CORE_FREQUENCY, MeasurementType.CORE_VOLTAGE,
-                       MeasurementType.CORE_PSTATE]:
-                # Replace generic "CORE" with specific core number
-                base_name = base_name.replace("CORE", f"CORE{core_num}")
-            elif self in [MeasurementType.CPU_USAGE_LOGICAL, MeasurementType.CPU_FREQUENCY_LOGICAL]:
-                # For logical CPU metrics, append the core number
-                base_name = base_name + f"_{core_num}"
-        
-        # Append statistic suffix
-        return f"{base_name}_{statistic}"
+        if "{core_num}" in self.column_name:
+            return self.column_name.format(core_num=core_num)
+        return self.column_name
     
-    def is_energy_metric(self) -> bool:
+    def get_column_name_with_statistic(self, statistic=None):
         """
-        Check if this measurement type is an energy metric.
+        Get the column name with a statistical suffix.
         
-        :return: True if it's an energy metric, False otherwise.
+        Args:
+            statistic: Statistical suffix (mean, std, median, min, max, LQ, UQ)
+            
+        Returns:
+            str: The column name with the statistical suffix appended
         """
-        return "ENERGY" in self.value
+        if not statistic:
+            return self.column_name
+            
+        return f"{self.column_name}_{statistic}"
+    
+    def get_full_column_name(self, core_num=None, statistic=None):
+        """
+        Get the complete column name with core number and statistical suffix.
+        
+        Args:
+            core_num: The core number to substitute (if applicable)
+            statistic: Statistical suffix (mean, std, median, min, max, LQ, UQ)
+            
+        Returns:
+            str: The complete column name
+        """
+        col_name = self.column_name
+        if core_num is not None and "{core_num}" in col_name:
+            col_name = col_name.format(core_num=core_num)
+            
+        if statistic:
+            col_name = f"{col_name}_{statistic}"
+            
+        return col_name

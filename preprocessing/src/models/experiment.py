@@ -87,20 +87,8 @@ class Experiment:
                 continue
             
             # For energy measurements, add stat panels with detailed statistics
-            if "ENERGY" in str(measurement_type) or measurement_type == MeasurementType.CPU_ENERGY:
+            if "ENERGY" in str(measurement_type):
                 for group in self.groups:
-                    # First add the regular graph panel
-                    if measurement_type in [MeasurementType.CORE_ENERGY]:
-                        panel = self._create_per_core_panel(measurement_type, group, y_pos)
-                        if panel:
-                            panels.append(panel)
-                            y_pos += 9
-                    else:
-                        panel = self._create_standard_panel(measurement_type, group.name, y_pos)
-                        panels.append(panel)
-                        y_pos += 9
-                    
-                    # Then add stat panels showing final energy values with statistics
                     stat_panels = self._create_energy_stat_panels(measurement_type, group.name, y_pos)
                     panels.extend(stat_panels)
                     y_pos += 4  # Stat panels are smaller
