@@ -1,95 +1,68 @@
-import re
-from dataclasses import dataclass
 from enum import Enum
-
+from typing import Optional
 
 
 class MeasurementType(Enum):
-    """
-    Enum class defining measurement types for experiments.
-    TODO: finish doc
-    - SYSTEM_ENERGY: System energy consumption, Apple CPUs only
-    - CPU_ENERGY: overall CPU energy consumption
-    - CPU_POWER: overall CPU power consumption
-    - POWER_PER_CORE: power consumption separated per core, only available for AMD
-    - VOLTAGE_PER_CORE: voltage per core, only available for AMD
-    - FREQUENCIES: CPU frequencies per logical processor and core
-    - USAGES_PER_LOGICAL_PROCESSOR: CPU usages per logical processor
-
-    - MEMORY: Memory usages
-    - GPU_METRICS: GPU metrics
-
-    TODO: make numbers a list of possible interesting columns and make the parsing in respective functions check for existence
-    """
-    ALL = 0
-    SYSTEM_ENERGY = 1
-    SYSTEM_POWER = 2
-    CPU_ENERGY = 3
-    CPU_POWER = 4
-
-    POWER_PER_CORE = 5
-    ENERGY_PER_CORE = 6
-    VOLTAGE_PER_CORE = 7
-    FREQUENCIES = 8
-    USAGES_PER_LOGICAL_PROCESSOR = 9
-    MEMORY = 10
-    TEMPERATURE = 11
-    GPU_METRICS = 12
-
-    # TODO: Add column names that can be used for analysis
-    # TODO: how to deal w/ platform-dependent columns (DRAM, GPU usage, etc.)
-
-    def columns(self) -> [str]:
-        dictionary = {
-            'SYSTEM_POWER': [r'SYSTEM_POWER .*'],
-            'SYSTEM_ENERGY': ['SYSTEM_ENERGY .*'],
-            'CPU_ENERGY': [r'.*CPU_ENERGY .*', 'PACKAGE_ENERGY .*'],
-            'CPU_POWER': ['CPU_POWER .*', 'PACKAGE_POWER .*'],
-            'POWER_PER_CORE': [r'CORE\d+_POWER .*', 'PP1_POWER .*'],
-            'ENERGY_PER_CORE': [r'CORE\d+_ENERGY .*', 'PP1_ENERGY .*'],
-            'VOLTAGE_PER_CORE': [r'CORE\d+_VOLT .*'],
-            'FREQUENCIES': [r'CPU_FREQUENCY_\d+', r'CORE\d+_FREQ .*'],
-            'USAGES_PER_LOGICAL_PROCESSOR': [r'CPU_USAGE_\d+'],
-            'MEMORY': ['TOTAL_MEMORY', 'TOTAL_SWAP', 'USED_MEMORY', 'USED_SWAP'],
-            'TEMPERATURE': [r'CPU_TEMP_\d+'],
-            'GPU_METRICS': [r'GPU*']
-        }
-        return dictionary[self.name]
-
-    # TODO: fix
-    def to_targets(self) -> [dict]:
-        return [{}]
-    # def to_grafana_columns(self) -> [PrimaryColumn]:
-    #     """
-    #     Convert measuremnt type to Grafana columns.
-    #
-    #     :return: List of columns
-    #     """
-    #     predefined_columns = {
-    #         MeasurementType.SYSTEM_POWER: SYSTEM_POWER_COLUMN,
-    #         MeasurementType.SYSTEM_ENERGY: SYSTEM_ENERGY_COLUMN,
-    #         MeasurementType.CPU_ENERGY: CPU_ENERGY_COLUMN,
-    #         MeasurementType.CPU_POWER: CPU_POWER_COLUMN,
-    #         MeasurementType.MEMORY: TOTAL_MEMORY_COLUMN,
-    #     }
-    #     return predefined_columns[self]
-
-    def column_names_to_targets(self, column_names: [str]) -> dict:
+    """Enum representing the type of measurements available in the system."""
+    
+    # Core-specific measurements
+    CORE_ENERGY = "CORE_ENERGY (J)"
+    CORE_POWER = "CORE_POWER (W)"
+    CORE_FREQUENCY = "CORE_FREQ (MHZ)"
+    CORE_VOLTAGE = "CORE_VOLT (V)"
+    CORE_PSTATE = "CORE_PSTATE"
+    
+    # CPU-wide measurements
+    CPU_ENERGY = "CPU_ENERGY (J)"
+    CPU_POWER = "CPU_POWER (W)"
+    CPU_USAGE_LOGICAL = "CPU_USAGE"
+    CPU_FREQUENCY_LOGICAL = "CPU_FREQUENCY"
+    
+    # Memory measurements
+    TOTAL_MEMORY = "TOTAL_MEMORY"
+    USED_MEMORY = "USED_MEMORY"
+    TOTAL_SWAP = "TOTAL_SWAP"
+    USED_SWAP = "USED_SWAP"
+    
+    # System-wide measurements
+    SYSTEM_ENERGY = "SYSTEM_ENERGY (J)" 
+    SYSTEM_POWER = "SYSTEM_POWER (W)"
+    
+    # Special
+    ALL = "ALL"
+    
+    @property
+    def get_column_name(self) -> str:
+        """Get the column name in the CSV file corresponding to this measurement type."""
+        return self.value
+    
+    def get_full_column_name(self, core_num: Optional[int] = None, statistic: str = "median") -> str:
         """
-        Convert column name to Grafana target.
+        Get the full column name including core number (if applicable) and statistic.
+        
+        :param core_num: The core number (if applicable).
+        :param statistic: The statistic (mean, median, min, max, etc).
+        :return: The full column name.
         """
-        regexs = self.columns()
-        targets = []
-        for r in regexs:
-            targets += [targets.append({
-                "selector": c,
-                "text": c,
-                "type": "number",
-            }) for c in column_names if re.match(r, c) != None]
-        return targets
-
-    def __str__(self):
+        base_name = self.value
+        
+        if core_num is not None:
+            if self in [MeasurementType.CORE_ENERGY, MeasurementType.CORE_POWER, 
+                       MeasurementType.CORE_FREQUENCY, MeasurementType.CORE_VOLTAGE,
+                       MeasurementType.CORE_PSTATE]:
+                # Replace generic "CORE" with specific core number
+                base_name = base_name.replace("CORE", f"CORE{core_num}")
+            elif self in [MeasurementType.CPU_USAGE_LOGICAL, MeasurementType.CPU_FREQUENCY_LOGICAL]:
+                # For logical CPU metrics, append the core number
+                base_name = base_name + f"_{core_num}"
+        
+        # Append statistic suffix
+        return f"{base_name}_{statistic}"
+    
+    def is_energy_metric(self) -> bool:
         """
-        String representation of the measurement type.
+        Check if this measurement type is an energy metric.
+        
+        :return: True if it's an energy metric, False otherwise.
         """
-        return " ".join([word[0].upper() + word[1:] for word in self.name.lower().split("_")])
+        return "ENERGY" in self.value

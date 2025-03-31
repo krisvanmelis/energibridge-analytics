@@ -17,6 +17,7 @@ import os
 class Group:
     name: str
     trials: List[Trial]
+    input_folder = 'csv-data/input/'  # always this folder
     output_folder = 'csv-data/output/'  # always this folder
 
     # Number of cores and logical processors (easier for exporting to Grafana)
@@ -31,47 +32,27 @@ class Group:
     summary_path: str
     summary: pd.DataFrame
 
-    def __init__(self, name: str, folder_path: str = '', is_import: bool = False) -> None:
+    def __init__(self, name: str) -> None:
         self.name = name
 
-        if not is_import:
-            if not os.path.exists(folder_path):
-                raise FileNotFoundError(f'Group folder {folder_path} does not exist.')
+        folder_path = os.path.join(self.input_folder, name)
 
-            # check and create output folder for group
-            output_folder_path = os.path.join(self.output_folder, name)
-            if not os.path.exists(output_folder_path):
-                os.makedirs(output_folder_path)
+        if not os.path.exists(folder_path):
+            raise FileNotFoundError(f'Group folder {folder_path} does not exist.')
 
-            # preprocess all trials in input folder and save them to output folder
-            self.trials = [Trial(os.path.join(folder_path, file_name), os.path.join(output_folder_path, file_name))
-                           for file_name in os.listdir(folder_path) if file_name.endswith(".csv")]
-            if len(self.trials) == 0:
-                raise FileNotFoundError(f'No trials found in folder: "{folder_path}"')
-            # aggregate and summarize the group
-            self.aggregate()
-            self.summarize()
-        else:
-            # for importing existing groups from the output folder.
-            group_folder_path = os.path.join(self.output_folder, name)
+        # check and create output folder for group
+        output_folder_path = os.path.join(self.output_folder, name)
+        if not os.path.exists(output_folder_path):
+            os.makedirs(output_folder_path)
 
-            # find all trial csvs in folder, identified by the ending of the filename
-            self.trials = [Trial(preprocessed_path=os.path.join(group_folder_path, f))
-                           for f in os.listdir(group_folder_path)
-                           if f.endswith("_preprocessed.csv")]
-
-            if len(self.trials) == 0:
-                raise FileNotFoundError(f'No trials found in folder: "{group_folder_path}"')
-
-            # Check if the aggregate data and summary statistics are already present, load if yes, create if no.
-            if os.path.join(group_folder_path, 'aggregate_data.csv') in os.listdir(group_folder_path):
-                self.aggregate_data = pd.read_csv(os.path.join(group_folder_path, 'aggregate_data.csv'))
-            else:
-                self.aggregate()
-            if os.path.join(group_folder_path, 'summary.csv') in os.listdir(group_folder_path):
-                self.summary = pd.read_csv(os.path.join(group_folder_path, 'summary.csv'))
-            else:
-                self.summarize()
+        # preprocess all trials in input folder and save them to output folder
+        self.trials = [Trial(os.path.join(folder_path, file_name), os.path.join(output_folder_path, file_name))
+                        for file_name in os.listdir(folder_path) if file_name.endswith(".csv")]
+        if len(self.trials) == 0:
+            raise FileNotFoundError(f'No trials found in folder: "{folder_path}"')
+        # aggregate and summarize the group
+        self.aggregate()
+        self.summarize()
 
         self.no_cores = self.trials[0].no_cores()
         self.no_logical = self.trials[0].no_logical()

@@ -20,7 +20,3145 @@
     "graphTooltip": 1,
     "id": 1,
     "links": [],
-    "panels": [],
+    "panels": [
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "SYSTEM_ENERGY_median",
+                            "text": "SYSTEM_ENERGY",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - SYSTEM_ENERGY",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "SYSTEM_POWER (Lower Quartile)"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.fillBelowTo",
+                                "value": "SYSTEM_POWER (Upper Quartile)"
+                            },
+                            {
+                                "id": "custom.lineStyle",
+                                "value": {
+                                    "fill": "dash",
+                                    "dash": [
+                                        3,
+                                        3
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "rgba(77, 112, 255, 0.4)",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "SYSTEM_POWER (Upper Quartile)"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.lineStyle",
+                                "value": {
+                                    "fill": "dash",
+                                    "dash": [
+                                        3,
+                                        3
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "rgba(77, 112, 255, 0.4)",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 9
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "multi",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time (s)",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "SYSTEM_POWER_median",
+                            "text": "SYSTEM_POWER (Median)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "SYSTEM_POWER_LQ",
+                            "text": "SYSTEM_POWER (Lower Quartile)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "SYSTEM_POWER_UQ",
+                            "text": "SYSTEM_POWER (Upper Quartile)",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - SYSTEM_POWER",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 18
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_ENERGY (J)_median",
+                            "text": "CPU_ENERGY",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - CPU_ENERGY",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "CPU_POWER (Lower Quartile)"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.fillBelowTo",
+                                "value": "CPU_POWER (Upper Quartile)"
+                            },
+                            {
+                                "id": "custom.lineStyle",
+                                "value": {
+                                    "fill": "dash",
+                                    "dash": [
+                                        3,
+                                        3
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "rgba(77, 112, 255, 0.4)",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "CPU_POWER (Upper Quartile)"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.lineStyle",
+                                "value": {
+                                    "fill": "dash",
+                                    "dash": [
+                                        3,
+                                        3
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "rgba(77, 112, 255, 0.4)",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 27
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "multi",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time (s)",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "CPU_POWER (W)_median",
+                            "text": "CPU_POWER (Median)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_POWER (W)_LQ",
+                            "text": "CPU_POWER (Lower Quartile)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_POWER (W)_UQ",
+                            "text": "CPU_POWER (Upper Quartile)",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - CPU_POWER",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 36
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "DIFF_CPU_ENERGY (J)_median",
+                            "text": "DIFF_CPU_ENERGY",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - DIFF_CPU_ENERGY",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 45
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time (s)",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "CORE0_ENERGY (J)_median",
+                            "text": "Core 0",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE1_ENERGY (J)_median",
+                            "text": "Core 1",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE2_ENERGY (J)_median",
+                            "text": "Core 2",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE3_ENERGY (J)_median",
+                            "text": "Core 3",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE4_ENERGY (J)_median",
+                            "text": "Core 4",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE5_ENERGY (J)_median",
+                            "text": "Core 5",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE6_ENERGY (J)_median",
+                            "text": "Core 6",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE7_ENERGY (J)_median",
+                            "text": "Core 7",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - Per Core ENERGY",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 54
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time (s)",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "CORE0_POWER (W)_median",
+                            "text": "Core 0",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE1_POWER (W)_median",
+                            "text": "Core 1",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE2_POWER (W)_median",
+                            "text": "Core 2",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE3_POWER (W)_median",
+                            "text": "Core 3",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE4_POWER (W)_median",
+                            "text": "Core 4",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE5_POWER (W)_median",
+                            "text": "Core 5",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE6_POWER (W)_median",
+                            "text": "Core 6",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE7_POWER (W)_median",
+                            "text": "Core 7",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - Per Core POWER",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 63
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "DIFF_CORE{core_num}_ENERGY (J)_median",
+                            "text": "DIFF_CORE_ENERGY",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - DIFF_CORE_ENERGY",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 72
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time (s)",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "CORE0_FREQ (MHZ)_median",
+                            "text": "Core 0",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE1_FREQ (MHZ)_median",
+                            "text": "Core 1",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE2_FREQ (MHZ)_median",
+                            "text": "Core 2",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE3_FREQ (MHZ)_median",
+                            "text": "Core 3",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE4_FREQ (MHZ)_median",
+                            "text": "Core 4",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE5_FREQ (MHZ)_median",
+                            "text": "Core 5",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE6_FREQ (MHZ)_median",
+                            "text": "Core 6",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE7_FREQ (MHZ)_median",
+                            "text": "Core 7",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - Per Core FREQUENCY",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 81
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time (s)",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "CORE0_VOLT (V)_median",
+                            "text": "Core 0",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE1_VOLT (V)_median",
+                            "text": "Core 1",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE2_VOLT (V)_median",
+                            "text": "Core 2",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE3_VOLT (V)_median",
+                            "text": "Core 3",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE4_VOLT (V)_median",
+                            "text": "Core 4",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE5_VOLT (V)_median",
+                            "text": "Core 5",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE6_VOLT (V)_median",
+                            "text": "Core 6",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE7_VOLT (V)_median",
+                            "text": "Core 7",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - Per Core VOLTAGE",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 90
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time (s)",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "CORE0_PSTATE_median",
+                            "text": "Core 0",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE1_PSTATE_median",
+                            "text": "Core 1",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE2_PSTATE_median",
+                            "text": "Core 2",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE3_PSTATE_median",
+                            "text": "Core 3",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE4_PSTATE_median",
+                            "text": "Core 4",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE5_PSTATE_median",
+                            "text": "Core 5",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE6_PSTATE_median",
+                            "text": "Core 6",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CORE7_PSTATE_median",
+                            "text": "Core 7",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - Per Core PSTATE",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 99
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_0_median",
+                            "text": "LP 0",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_1_median",
+                            "text": "LP 1",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_2_median",
+                            "text": "LP 2",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_3_median",
+                            "text": "LP 3",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_4_median",
+                            "text": "LP 4",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_5_median",
+                            "text": "LP 5",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_6_median",
+                            "text": "LP 6",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_7_median",
+                            "text": "LP 7",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_8_median",
+                            "text": "LP 8",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_9_median",
+                            "text": "LP 9",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_10_median",
+                            "text": "LP 10",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_11_median",
+                            "text": "LP 11",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_12_median",
+                            "text": "LP 12",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_13_median",
+                            "text": "LP 13",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_14_median",
+                            "text": "LP 14",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_FREQUENCY_15_median",
+                            "text": "LP 15",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - CPU_FREQUENCY_LOGICAL",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 108
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_0_median",
+                            "text": "LP 0",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_1_median",
+                            "text": "LP 1",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_2_median",
+                            "text": "LP 2",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_3_median",
+                            "text": "LP 3",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_4_median",
+                            "text": "LP 4",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_5_median",
+                            "text": "LP 5",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_6_median",
+                            "text": "LP 6",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_7_median",
+                            "text": "LP 7",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_8_median",
+                            "text": "LP 8",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_9_median",
+                            "text": "LP 9",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_10_median",
+                            "text": "LP 10",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_11_median",
+                            "text": "LP 11",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_12_median",
+                            "text": "LP 12",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_13_median",
+                            "text": "LP 13",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_14_median",
+                            "text": "LP 14",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "CPU_USAGE_15_median",
+                            "text": "LP 15",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - CPU_USAGE_LOGICAL",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 117
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "TOTAL_MEMORY_median",
+                            "text": "TOTAL_MEMORY",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - TOTAL_MEMORY",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 126
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "USED_MEMORY_median",
+                            "text": "USED_MEMORY",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - USED_MEMORY",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 135
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "TOTAL_SWAP_median",
+                            "text": "TOTAL_SWAP",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - TOTAL_SWAP",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 144
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "USED_SWAP_median",
+                            "text": "USED_SWAP",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - USED_SWAP",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 153
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "TEMPERATURE_median",
+                            "text": "TEMPERATURE",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - TEMPERATURE",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "PEB6B42F54C42D283"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 162
+            },
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xField": "Time (s)"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "PEB6B42F54C42D283"
+                    },
+                    "format": "table",
+                    "parser": "csv",
+                    "refId": "A",
+                    "source": "url",
+                    "type": "csv",
+                    "url": "http://nginx/csv-data/output/sample_group/aggregate_data.csv",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "columns": [
+                        {
+                            "selector": "Time",
+                            "text": "Time",
+                            "type": "timestamp_epoch",
+                            "format": "unixtimestampms"
+                        },
+                        {
+                            "selector": "Time (s)",
+                            "text": "Time (s)",
+                            "type": "number"
+                        },
+                        {
+                            "selector": "GPU_METRICS_median",
+                            "text": "GPU_METRICS",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "title": "All: sample_group - GPU_METRICS",
+            "type": "timeseries",
+            "transformations": [
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "Time (s)",
+                        "binary": {
+                            "left": {
+                                "field": "Time"
+                            },
+                            "operator": "/",
+                            "right": {
+                                "field": "1000"
+                            }
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "Time": true
+                        },
+                        "indexByName": {},
+                        "renameByName": {}
+                    }
+                }
+            ]
+        }
+    ],
     "preload": true,
     "refresh": "5s",
     "schemaVersion": 40,

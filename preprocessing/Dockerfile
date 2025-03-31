@@ -8,4 +8,4 @@ COPY . .
 
 ENV PYTHONPATH=/app/src
 
-CMD ["flask", "run", "--host=0.0.0.0", "--app", "src.app", "--debug", "--reload"]
+CMD ["python", "src/main.py"]
