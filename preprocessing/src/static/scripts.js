@@ -33,6 +33,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 });
 
+document.addEventListener('DOMContentLoaded', async () => {
+    const folderPathSelect = document.getElementById('folder-path');
+    try {
+        const response = await fetch('/csv-data/input/');
+        const data = await response.json(); // Assuming the endpoint returns a JSON array of folder names
+
+        data.folders.forEach(folder => {
+            const option = document.createElement('option');
+            option.value = folder;
+            option.textContent = folder;
+            folderPathSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error fetching folder paths:', error);
+    }
+});
+
 function updateGroupTable(groups) {
     const tableBody = document.getElementById('group-table').querySelector('tbody');
     tableBody.innerHTML = '';
@@ -162,3 +179,5 @@ async function syncPanels() {
 
     updatePanelTable(response.panels);
 }
+
+

@@ -17,9 +17,10 @@ class GroupService:
         print('Looking for existing groups in:', Group.output_folder)
         if not os.path.exists(Group.output_folder):
             os.makedirs(Group.output_folder)
-        self._groups = [Group(f, is_import=True)
-                        for f in os.listdir(Group.output_folder)
-                        if os.path.isdir(os.path.join(Group.output_folder, f))]
+        # self._groups = [Group(f, is_import=True)
+        #                 for f in os.listdir(Group.output_folder)
+        #                 if os.path.isdir(os.path.join(Group.output_folder, f))]
+        self._groups = []
         print('Found the following groups:', [group.name for group in self._groups])
         #print(f'No. cores found in first group: {str(self._groups[0].no_cores)}')
 

@@ -15,7 +15,7 @@ from grafana_visualization_service import GrafanaVisualizationService
 
 # Path where Grafana dashboard config will be saved
 # DASHBOARD_CONFIG_SAVE_PATH = '../var/lib/grafana/dashboards/test_config.json'
-DASHBOARD_CONFIG_SAVE_PATH = '../var/lib/grafana/dashboards/test_config4.json'
+DASHBOARD_CONFIG_SAVE_PATH = 'grafana/dashboards/energibridge-dashboard.json'
 
 GRAFANA_URL = 'http://localhost:3000'
 

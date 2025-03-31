@@ -7,7 +7,7 @@ from typing import List
 
 #from dashboards import generate_dashboard
 from models.panel_config import PanelConfig
-from dashboards_new import generate_dashboard_v2
+from dashboards import generate_dashboard
 
 
 class GrafanaVisualizationService:
@@ -30,10 +30,9 @@ class GrafanaVisualizationService:
 
         :param panel_configs: List of grafana panel configurations.
         """
-        grafana_config = generate_dashboard_v2(panel_configs)
-        dir_name = os.path.dirname(self._dashboard_config_save_path)
+        grafana_config = generate_dashboard(panel_configs)
 
-        if not os.path.exists(dir_name):
-            os.makedirs(dir_name)
         with open(self._dashboard_config_save_path, 'w') as json_file:
             json.dump(grafana_config, json_file, indent=4)
+
+        print(f'Grafana dashboard configuration saved to: {self._dashboard_config_save_path}')

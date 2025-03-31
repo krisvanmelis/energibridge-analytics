@@ -1,0 +1,43 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 1,
+    "id": 1,
+    "links": [],
+    "panels": [],
+    "preload": true,
+    "refresh": "5s",
+    "schemaVersion": 40,
+    "tags": [],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "2025-02-25T23:07:27.503Z",
+        "to": "2025-02-25T23:07:58.558Z"
+    },
+    "timepicker": {
+        "refresh_intervals": []
+    },
+    "timezone": "browser",
+    "title": "Energibridge Dashboard",
+    "uid": "cLV5GDCkz",
+    "version": 1,
+    "weekStart": ""
+}

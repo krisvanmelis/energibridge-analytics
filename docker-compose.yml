@@ -41,6 +41,7 @@ services:
     build: ./preprocessing
     volumes:
       - ./csv-data:/app/csv-data
+      - ./grafana/dashboards:/app/grafana/dashboards
     ports:
       - "5000:5000"
     depends_on:

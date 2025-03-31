@@ -8,10 +8,6 @@ from typing import List
 
 from numpy.ma.core import outer, argmax
 
-# from preprocessing.src.models.trial import Trial
-# from preprocessing.src.models.types.measurement_type import MeasurementType
-# from preprocessing.src.models.types.visualization_type import VisualizationType
-
 from models.trial import Trial
 from models.types.measurement_type import MeasurementType
 from models.types.visualization_type import VisualizationType
