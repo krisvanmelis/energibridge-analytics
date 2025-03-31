@@ -23,12 +23,10 @@ class MeasurementType(Enum):
     # CPU-level aggregated measurements
     CPU_ENERGY = (20, "CPU_ENERGY (J)")
     CPU_POWER = (21, "CPU_POWER (W)")
-    DIFF_CPU_ENERGY = (22, "DIFF_CPU_ENERGY (J)")
     
     # Per-core energy and power measurements
     CORE_ENERGY = (30, "CORE{core_num}_ENERGY (J)")
     CORE_POWER = (31, "CORE{core_num}_POWER (W)")
-    DIFF_CORE_ENERGY = (32, "DIFF_CORE{core_num}_ENERGY (J)")
     
     # Per-core frequency, voltage, and p-state measurements
     CORE_FREQUENCY = (40, "CORE{core_num}_FREQ (MHZ)")
@@ -40,7 +38,7 @@ class MeasurementType(Enum):
     CPU_USAGE_LOGICAL = (51, "CPU_USAGE_{core_num}")
     
     # Memory metrics
-    TOTAL_MEMORY = (60, "TOTAL_MEMORY")
+    # TOTAL_MEMORY = (60, "TOTAL_MEMORY") Seems to be the same value for all rows
     USED_MEMORY = (61, "USED_MEMORY")
     TOTAL_SWAP = (62, "TOTAL_SWAP")
     USED_SWAP = (63, "USED_SWAP")

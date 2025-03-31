@@ -52,7 +52,6 @@ class Group:
             raise FileNotFoundError(f'No trials found in folder: "{folder_path}"')
         # aggregate and summarize the group
         self.aggregate()
-        self.summarize()
 
         self.no_cores = self.trials[0].no_cores()
         self.no_logical = self.trials[0].no_logical()
@@ -101,36 +100,6 @@ class Group:
         self.aggregate_data_path = os.path.join(os.path.join(self.output_folder, self.name), 'aggregate_data.csv')
         self.aggregate_data.to_csv(self.aggregate_data_path, index=False)
 
-    def summarize(self) -> None:
-        """
-        Generate summary statistics for the group. - BROKEN, WILL BE FIXED ASAP
-        - Total energy per trial
-        - peak power per trial
-        - average total energy overall
-        - average peak power overall (Row)
-        - TODO: normal tests? (for energy consumption, peak power, etc.)
-        """
-        summary = pd.DataFrame(columns=['Trial name', 'Total Energy (J)', 'Peak Power (W)', 'Median Power (W)']).set_index('Trial name')
-        for trial in self.trials:
-            row = [
-                trial.preprocessed_data['CPU_ENERGY (J)'].iloc[-1] - trial.preprocessed_data['CPU_ENERGY (J)'].iloc[0],
-                trial.preprocessed_data['CPU_POWER (W)'].max(),
-                trial.preprocessed_data['CPU_POWER (W)'].median()
-                ]
-            summary.loc[trial.filename] = row
-        summary.loc['Mean Overall'] = [
-            summary['Total Energy (J)'].mean(),
-            summary['Peak Power (W)'].mean(),
-            summary['Median Power (W)'].mean()
-        ]
-        summary.loc['Median Overall'] = [
-            summary['Total Energy (J)'].median(),
-            summary['Peak Power (W)'].median(),
-            summary['Median Power (W)'].median()
-        ]
-        self.summary = summary
-        self.summary_path = os.path.join(os.path.join(self.output_folder, self.name), 'summary.csv')
-        self.summary.to_csv(self.summary_path, index=True)
 
     def visualize(self, measurement_types: List[MeasurementType], visualization_type: VisualizationType) -> dict:
         """
@@ -140,10 +109,6 @@ class Group:
         # Aggregate data
         self.aggregate(measurement_types)
 
-        # Summarize data
-        self.summarize(measurement_types)
-
-        # TODO: Add logic to visualize the group data to a panel
 
     def print(self) -> None:
         print(f"Group: {self.name}")
@@ -161,10 +126,3 @@ class Group:
         Convert group to dictionary parseable by frontend.
         """
         return {'name': self.name, 'trial_count': str(len(self.trials))}
-
-    def delete_data_from_disk(self):
-        """
-        Delete processed data from disk.
-        """
-        group_path = os.path.join(self.output_folder, self.name)
-        shutil.rmtree(group_path)
