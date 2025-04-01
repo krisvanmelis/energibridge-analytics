@@ -93,34 +93,6 @@
     "title": "PLACEHOLDER_MEASUREMENTTYPE",
     "type": "timeseries",
     "transformations": [
-        {
-            "id": "calculateField",
-            "options": {
-                "alias": "Time (s)",
-                "binary": {
-                    "left": {
-                        "field": "Time"
-                    },
-                    "operator": "/",
-                    "right": {
-                        "field": "1000"
-                    }
-                },
-                "mode": "binary",
-                "reduce": {
-                    "reducer": "sum"
-                }
-            }
-        },
-        {
-            "id": "organize",
-            "options": {
-                "excludeByName": {
-                    "Time": true
-                },
-                "indexByName": {},
-                "renameByName": {}
-            }
-        }
+        
     ]
 }

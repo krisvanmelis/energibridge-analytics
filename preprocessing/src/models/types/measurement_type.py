@@ -17,39 +17,39 @@ class MeasurementType(Enum):
     DELTA = (2, "Delta")
     
     # System-level measurements
-    SYSTEM_ENERGY = (10, "SYSTEM_ENERGY")
-    SYSTEM_POWER = (11, "SYSTEM_POWER")
+    #SYSTEM_ENERGY = (10, "SYSTEM_ENERGY")
+    #SYSTEM_POWER = (11, "SYSTEM_POWER")
     
     # CPU-level aggregated measurements
-    CPU_ENERGY = (20, "CPU_ENERGY (J)")
-    CPU_POWER = (21, "CPU_POWER (W)")
+    #CPU_ENERGY = (20, "CPU_ENERGY (J)")
+    CPU_POWER = (21, "CPU_POWER (W)", "watt")
     
     # Per-core energy and power measurements
-    CORE_ENERGY = (30, "CORE{core_num}_ENERGY (J)")
-    CORE_POWER = (31, "CORE{core_num}_POWER (W)")
+    #CORE_ENERGY = (30, "CORE{core_num}_ENERGY (J)")
+    CORE_POWER = (31, "CORE{core_num}_POWER (W)", "watt")
     
     # Per-core frequency, voltage, and p-state measurements
-    CORE_FREQUENCY = (40, "CORE{core_num}_FREQ (MHZ)")
-    CORE_VOLTAGE = (41, "CORE{core_num}_VOLT (V)")
+    CORE_FREQUENCY = (40, "CORE{core_num}_FREQ (MHZ)", "rotmhz")
+    CORE_VOLTAGE = (41, "CORE{core_num}_VOLT (V)", "volt")
     CORE_PSTATE = (42, "CORE{core_num}_PSTATE")
     
     # CPU usage and frequency per logical processor
-    CPU_FREQUENCY_LOGICAL = (50, "CPU_FREQUENCY_{core_num}")
-    CPU_USAGE_LOGICAL = (51, "CPU_USAGE_{core_num}")
+    CPU_FREQUENCY_LOGICAL = (50, "CPU_FREQUENCY_{core_num}", "rotmhz")
+    CPU_USAGE_LOGICAL = (51, "CPU_USAGE_{core_num}", "percent")
     
     # Memory metrics
     # TOTAL_MEMORY = (60, "TOTAL_MEMORY") Seems to be the same value for all rows
-    USED_MEMORY = (61, "USED_MEMORY")
-    TOTAL_SWAP = (62, "TOTAL_SWAP")
-    USED_SWAP = (63, "USED_SWAP")
+    USED_MEMORY = (61, "USED_MEMORY", "decbytes")
+    TOTAL_SWAP = (62, "TOTAL_SWAP", "decbytes")
+    USED_SWAP = (63, "USED_SWAP", "decbytes")
     
     # Temperature metrics
-    TEMPERATURE = (70, "TEMPERATURE")
+    #TEMPERATURE = (70, "TEMPERATURE", "celsius")
     
     # GPU metrics
-    GPU_METRICS = (80, "GPU_METRICS")
+    #GPU_METRICS = (80, "GPU_METRICS")
 
-    def __init__(self, value, column_name):
+    def __init__(self, value, column_name, unit=None):
         """
         Initialize the enum with a value and column name.
         
@@ -59,6 +59,7 @@ class MeasurementType(Enum):
         """
         self._value_ = value
         self.column_name = column_name
+        self.unit = unit
 
     def __str__(self):
         """

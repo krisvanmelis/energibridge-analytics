@@ -122,71 +122,82 @@ class Experiment:
         panels = []
         stats = ["mean", "median", "min", "max", "LQ", "UQ", "std"]
         
+        # TODO: Add back ENERGY fields
         # For core energy, create a separate row of panels for each core
-        if measurement_type == MeasurementType.CORE_ENERGY:
-            # We'll create a row of panels for each core statistic
-            core_count = 8
-            for i in range(core_count):
-                x_pos = 0
-                for stat in stats:
-                    column_name = measurement_type.get_full_column_name(core_num=i, statistic=stat)
-                    title = f"Core {i} Energy {stat.upper()}"
+        # if measurement_type == MeasurementType.CORE_ENERGY:
+        #     # We'll create a row of panels for each core statistic
+        #     core_count = 8
+        #     for i in range(core_count):
+        #         x_pos = 0
+        #         for stat in stats:
+        #             column_name = measurement_type.get_full_column_name(core_num=i, statistic=stat)
+        #             title = f"Core {i} Energy {stat.upper()}"
                     
-                    panel = self._load_template_with_placeholders("stat_panel_template.json", {
-                        "TITLE": title,
-                        "GROUPNAME": group_name
-                    })
+        #             panel = self._load_template_with_placeholders("stat_panel_template.json", {
+        #                 "TITLE": title,
+        #                 "GROUPNAME": group_name
+        #             })
                     
-                    # Set panel position
-                    panel["gridPos"]["x"] = x_pos
-                    panel["gridPos"]["y"] = y_pos
+        #             # Set panel position
+        #             panel["gridPos"]["x"] = x_pos
+        #             panel["gridPos"]["y"] = y_pos
                     
-                    # Configure column to display
-                    panel["targets"][0]["columns"] = [{
-                        "selector": column_name,
-                        "text": title,
-                        "type": "number"
-                    }]
+        #             # Configure column to display
+        #             panel["targets"][0]["columns"] = [{
+        #                 "selector": column_name,
+        #                 "text": title,
+        #                 "type": "number"
+        #             }]
                     
-                    # Add unit configuration
-                    if stat == "std":
-                        panel["fieldConfig"]["defaults"]["unit"] = "joule"
-                        panel["title"] = f"Core {i} Energy StdDev"
+        #             # Add unit configuration
+        #             unit = ""
+        #             if measurement_type.unit:
+        #                 unit = measurement_type.unit
                     
-                    panels.append(panel)
-                    x_pos += 4  # Move to the next position in the row
+        #             panel["fieldConfig"]["defaults"]["unit"] = unit
+                    
+        #             if stat == "std":
+        #                 panel["title"] = f"Core {i} Energy StdDev"
+                    
+        #             panels.append(panel)
+        #             x_pos += 4  # Move to the next position in the row
                 
-                y_pos += 4  # Move to the next row for the next core
-        else:
-            # For other energy metrics like CPU_ENERGY, create a row of panels for each statistic
-            x_pos = 0
-            for stat in stats:
-                column_name = measurement_type.get_full_column_name(statistic=stat)
-                title = f"{str(measurement_type)} {stat.upper()}"
-                
-                panel = self._load_template_with_placeholders("stat_panel_template.json", {
-                    "TITLE": title,
-                    "GROUPNAME": group_name
-                })
-                
-                # Set panel position
-                panel["gridPos"]["x"] = x_pos
-                panel["gridPos"]["y"] = y_pos
-                
-                # Configure column to display
-                panel["targets"][0]["columns"] = [{
-                    "selector": column_name,
-                    "text": title,
-                    "type": "number"
-                }]
-                
-                # Add unit configuration
-                if stat == "std":
-                    panel["fieldConfig"]["defaults"]["unit"] = "joule"
-                    panel["title"] = f"{str(measurement_type)} StdDev"
-                
-                panels.append(panel)
-                x_pos += 4  # Move to the next position in the row
+        #         y_pos += 4  # Move to the next row for the next core
+        # else:
+        # For other energy metrics like CPU_ENERGY, create a row of panels for each statistic
+        x_pos = 0
+        for stat in stats:
+            column_name = measurement_type.get_full_column_name(statistic=stat)
+            title = f"{str(measurement_type)} {stat.upper()}"
+            
+            panel = self._load_template_with_placeholders("stat_panel_template.json", {
+                "TITLE": title,
+                "GROUPNAME": group_name
+            })
+            
+            # Set panel position
+            panel["gridPos"]["x"] = x_pos
+            panel["gridPos"]["y"] = y_pos
+            
+            # Configure column to display
+            panel["targets"][0]["columns"] = [{
+                "selector": column_name,
+                "text": title,
+                "type": "number"
+            }]
+            
+            # Add unit configuration
+            unit = "joule"
+            if measurement_type.unit:
+                unit = measurement_type.unit
+            
+            panel["fieldConfig"]["defaults"]["unit"] = unit
+            
+            if stat == "std":
+                panel["title"] = f"{str(measurement_type)} StdDev"
+            
+            panels.append(panel)
+            x_pos += 4  # Move to the next position in the row
         
         return panels
 
@@ -212,6 +223,10 @@ class Experiment:
         # Customize panel title and position
         panel["title"] = f"{self.name}: {group.name} - Per Core {metric_name}"
         panel["gridPos"]["y"] = y_pos
+        
+        # Apply unit to the panel
+        if measurement_type.unit:
+            panel["fieldConfig"]["defaults"]["unit"] = measurement_type.unit
         
         # Ensure targets array exists
         if "targets" not in panel:
@@ -267,6 +282,10 @@ class Experiment:
         panel["title"] = f"{self.name}: {group_name} - {str(measurement_type)}"
         panel["gridPos"]["y"] = y_pos
         
+        # Apply unit to the panel
+        if measurement_type.unit:
+            panel["fieldConfig"]["defaults"]["unit"] = measurement_type.unit
+        
         # Ensure targets array exists
         if "targets" not in panel:
             panel["targets"] = [{"columns": []}]
@@ -274,7 +293,8 @@ class Experiment:
             panel["targets"] = [{"columns": []}]
         
         # If this is a power measurement type, include quartiles
-        if measurement_type in [MeasurementType.CPU_POWER, MeasurementType.SYSTEM_POWER]:
+        # TODO: Add back ENERGY fields MeasurementType.SYSTEM_POWER
+        if measurement_type in [MeasurementType.CPU_POWER ]:
             # Create a list of columns with median, LQ and UQ for power data visualization
             columns = []
             # Add time column with correct format
@@ -284,7 +304,6 @@ class Experiment:
                 "type": "timestamp_epoch",
                 "format": "unixtimestampms"
             })
-
             
             # Add median value
             median_col = measurement_type.get_full_column_name(statistic="median")
@@ -393,14 +412,9 @@ class Experiment:
             # Add time column with correct format
             columns.append({
                 "selector": "Time",
-                "text": "Time",
+                "text": "Time (s)",
                 "type": "timestamp_epoch",
                 "format": "unixtimestampms"
-            })
-            columns.append({
-                "selector": "Time (s)",
-                "text": "Time (s)",
-                "type": "number"
             })
             
             # Add columns for each logical processor
@@ -426,14 +440,9 @@ class Experiment:
             # Add time column with correct format
             columns.append({
                 "selector": "Time",
-                "text": "Time",
+                "text": "Time (s)",
                 "type": "timestamp_epoch",
                 "format": "unixtimestampms"
-            })
-            columns.append({
-                "selector": "Time (s)",
-                "text": "Time (s)",
-                "type": "number"
             })
             
             # Add median value
