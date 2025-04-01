@@ -5,9 +5,10 @@ class ExperimentType(Enum):
     """
     Enum to define the type of experiment.
     """
-    DIFFERENCE = 1
+    PLOT_OVER_TIME = 1
     SIGNIFICANCE_TEST = 2
-    # TODO: Determine what experiments calculate what metrics
+    STATISTICS = 3
+
 
     def __str__(self):
         """

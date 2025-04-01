@@ -10,7 +10,6 @@ from numpy.ma.core import outer, argmax
 
 from models.trial import Trial
 from models.types.measurement_type import MeasurementType
-from models.types.visualization_type import VisualizationType
 import os
 
 
@@ -101,7 +100,7 @@ class Group:
         self.aggregate_data.to_csv(self.aggregate_data_path, index=False)
 
 
-    def visualize(self, measurement_types: List[MeasurementType], visualization_type: VisualizationType) -> dict:
+    def visualize(self, measurement_types: List[MeasurementType]) -> dict:
         """
         Returns the panel as a dictionary for grafana dashboard.
         """
