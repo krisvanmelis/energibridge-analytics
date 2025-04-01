@@ -34,6 +34,7 @@ services:
     volumes:
       - ./csv-data:/usr/share/nginx/html/csv-data:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./images:/usr/share/nginx/html/images:ro
     ports:
       - "8080:80"
 
@@ -42,6 +43,7 @@ services:
     volumes:
       - ./csv-data:/app/csv-data
       - ./grafana/dashboards:/app/grafana/dashboards
+      - ./images:/app/images
     ports:
       - "5000:5000"
     depends_on:
