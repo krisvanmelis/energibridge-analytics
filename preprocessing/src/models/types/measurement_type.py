@@ -42,6 +42,9 @@ class MeasurementType(Enum):
     USED_MEMORY = (61, "USED_MEMORY", "decbytes")
     TOTAL_SWAP = (62, "TOTAL_SWAP", "decbytes")
     USED_SWAP = (63, "USED_SWAP", "decbytes")
+
+    CPU_STATS = (70, "CPU STATS", "")
+    CORE_STATS = (71, "CORE_STATS", "")
     
     # Temperature metrics
     #TEMPERATURE = (70, "TEMPERATURE", "celsius")
