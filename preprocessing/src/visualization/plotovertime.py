@@ -31,7 +31,7 @@ class PlotOverTime:
             if "ENERGY" in str(measurement_type):
                 for group in groups:
                     stat_panels = PlotOverTime._create_energy_stat_panels(
-                        experiment_name, measurement_type, group.name, y_pos)
+                        measurement_type, group.name, y_pos)
                     panels.extend(stat_panels)
                     y_pos += 4  # Stat panels are smaller
             
@@ -40,7 +40,7 @@ class PlotOverTime:
                                     MeasurementType.CORE_FREQUENCY, MeasurementType.CORE_PSTATE]:
                 for group in groups:
                     panel = PlotOverTime._create_per_core_panel(
-                        experiment_name, measurement_type, group, y_pos)
+                        measurement_type, group, y_pos)
                     if panel:
                         panels.append(panel)
                         y_pos += 9
@@ -48,7 +48,7 @@ class PlotOverTime:
             else:
                 for group in groups:
                     panel = PlotOverTime._create_standard_panel(
-                        experiment_name, measurement_type, group.name, y_pos)
+                        measurement_type, group.name, y_pos)
                     panels.append(panel)
                     y_pos += 9
                     
@@ -70,12 +70,11 @@ class PlotOverTime:
             return json.loads(template)
     
     @staticmethod
-    def _create_energy_stat_panels(experiment_name: str, measurement_type: MeasurementType, 
+    def _create_energy_stat_panels(measurement_type: MeasurementType, 
                                    group_name: str, y_pos: int) -> List[Dict[str, Any]]:
         """
         Generate stat panels for energy measurements, showing individual statistics.
         
-        :param experiment_name: Name of the experiment
         :param measurement_type: The energy measurement type
         :param group_name: Name of the group to visualize
         :param y_pos: Vertical position on the dashboard
@@ -116,12 +115,11 @@ class PlotOverTime:
         return panels
 
     @staticmethod
-    def _create_per_core_panel(experiment_name: str, measurement_type: MeasurementType, 
+    def _create_per_core_panel(measurement_type: MeasurementType, 
                                group: Group, y_pos: int) -> Dict[str, Any]:
         """
         Generate a panel specifically for per-core measurements, showing data for all cores.
         
-        :param experiment_name: Name of the experiment
         :param measurement_type: The core measurement type (energy, power, voltage, etc.)
         :param group: The group whose data will be visualized
         :param y_pos: Vertical position on the dashboard
@@ -136,8 +134,8 @@ class PlotOverTime:
             "GROUPNAME": group.name
         })
         
-        # Customize panel title and position
-        panel["title"] = f"{experiment_name}: {group.name} - Per Core {metric_name}"
+        # Customize panel title and position - removing experiment name
+        panel["title"] = f"{group.name} - Per Core {metric_name}"
         panel["gridPos"]["y"] = y_pos
         
         # Apply unit to the panel
@@ -179,13 +177,12 @@ class PlotOverTime:
         return panel
     
     @staticmethod
-    def _create_standard_panel(experiment_name: str, measurement_type: MeasurementType, 
+    def _create_standard_panel(measurement_type: MeasurementType, 
                               group_name: str, y_pos: int) -> Dict[str, Any]:
         """
         Generate a standard panel for non-core measurements.
         For power measurements (CPU_POWER), also includes quartile data.
         
-        :param experiment_name: Name of the experiment
         :param measurement_type: The measurement type
         :param group_name: Name of the group to visualize
         :param y_pos: Vertical position on the dashboard
@@ -197,8 +194,8 @@ class PlotOverTime:
             "GROUPNAME": group_name
         })
         
-        # Set descriptive panel title and position
-        panel["title"] = f"{experiment_name}: {group_name} - {str(measurement_type)}"
+        # Set descriptive panel title and position - removing experiment name
+        panel["title"] = f"{group_name} - {str(measurement_type)}"
         panel["gridPos"]["y"] = y_pos
         
         # Apply unit to the panel

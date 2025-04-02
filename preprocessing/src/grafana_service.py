@@ -9,70 +9,54 @@ from models.experiment import Experiment
 
 class GrafanaService:
     """
-    Service that handles Grafana dashboard generation and configuration management.
-    Collects panels from experiments and composes them into a complete dashboard.
+    Service class for managing Grafana dashboard configurations.
     """
-    _dashboard_config_save_path: str
 
-    def __init__(self, dashboard_config_save_path: str):
+    def __init__(self, dashboard_config_path: str = 'grafana/dashboards'):
         """
-        Initialize the Grafana service with specified configuration path.
-
-        :param dashboard_config_save_path: File path where to save the generated dashboard JSON.
+        Initialize GrafanaService with path to save dashboard configs.
+        
+        :param dashboard_config_path: Path where to save dashboard configuration files
         """
-        self._dashboard_config_save_path = dashboard_config_save_path
+        self.dashboard_path = dashboard_config_path
+        # Ensure the dashboards directory exists
+        os.makedirs(os.path.dirname(dashboard_config_path), exist_ok=True)
 
     def create_dashboard_from_experiments(self, experiments: List[Experiment]) -> None:
         """
-        Generate a complete dashboard from multiple experiments and save it.
-        Collects all panels from experiments and arranges them in the dashboard.
-
-        :param experiments: List of experiments to include in the dashboard.
-        """
-        panels = []
+        Create a separate dashboard for each experiment.
         
-        # Collect panels from each experiment
+        :param experiments: List of experiments to visualize
+        """
         for experiment in experiments:
-            experiment_panels = experiment.create_visualization_panels()
-            if experiment_panels:
-                panels.extend(experiment_panels)
-                
-        # Generate the dashboard with all panels
-        grafana_config = self._generate_dashboard_config(panels)
+            self._create_single_experiment_dashboard(experiment)
 
-        # Save the configuration to file
-        self._save_dashboard_config(grafana_config)
+    def _create_single_experiment_dashboard(self, experiment: Experiment) -> None:
+        """
+        Create a dashboard for a single experiment.
         
-    def _save_dashboard_config(self, config: Dict[str, Any]) -> None:
+        :param experiment: Experiment to visualize
         """
-        Save the dashboard configuration to the specified file path.
+        # Get panels for this experiment
+        panels = experiment.create_visualization_panels()
         
-        :param config: The dashboard configuration as a dictionary.
-        """
-        with open(self._dashboard_config_save_path, 'w') as json_file:
-            json.dump(config, json_file, indent=4)
-
-        print(f'Grafana dashboard configuration saved to: {self._dashboard_config_save_path}')
-    
-    def _load_template_with_placeholders(self, template_name: str, placeholders: Dict[str, str]) -> Dict[str, Any]:
-        """
-        Load a template file and replace placeholders with actual values.
+        # Load dashboard template
+        with open("/app/csv-data/grafana-templates/dashboard_template.json", 'r') as file:
+            dashboard_template = json.load(file)
         
-        :param template_name: Name of the template file to load.
-        :param placeholders: Dictionary of placeholder replacements.
-        :return: Parsed JSON with placeholders replaced.
-        """
-        with open("csv-data/grafana-templates/" + template_name, 'r') as file:
-            template = file.read()
-            for key, value in placeholders.items():
-                template = template.replace("PLACEHOLDER_" + key, value)
-            return json.loads(template)
-
-    def _generate_dashboard_config(self, panels: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """
-        Generate a complete Grafana dashboard configuration with the provided panels.
-
-        :param panels: List of panel configurations to include.
-        :return: Complete dashboard configuration.
-        """
-        return self._load_template_with_placeholders("dashboard_template.json", {"PANELS": json.dumps(panels)})
+        # Insert panels and update dashboard title
+        dashboard_template["panels"] = panels
+        dashboard_template["title"] = f"Energibridge - {experiment.name}"
+        
+        # Generate a unique UID for the dashboard based on experiment name
+        sanitized_name = experiment.name.lower().replace(' ', '_').replace('-', '_')
+        dashboard_template["uid"] = f"eb_{sanitized_name}"
+        
+        # Save dashboard configuration
+        sanitized_filename = sanitized_name.replace(' ', '_').replace('/', '_')
+        save_path = os.path.join(os.path.dirname(self.dashboard_path), f"{sanitized_filename}.json")
+        
+        with open(save_path, 'w') as file:
+            json.dump(dashboard_template, file, indent=2)
+        
+        print(f"Dashboard for experiment '{experiment.name}' saved to {save_path}")

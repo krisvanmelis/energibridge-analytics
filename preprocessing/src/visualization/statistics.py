@@ -18,7 +18,7 @@ class Statistics:
         For CPU_STATS, shows CPU-level panels.
         For CORE_STATS, shows per-core panels.
 
-        :param experiment_name: Name of the experiment
+        :param experiment_name: Name of the experiment (used in dashboard title)
         :param groups: List of groups to visualize
         :param measurement_types: List of measurement types to visualize
         :param y_pos: Starting vertical position for panels
@@ -34,7 +34,7 @@ class Statistics:
                     # Energy Panel
                     energy_col = "CPU_Total_Energy (J)"
                     energy_panel = Statistics._create_combined_stat_panel(
-                        experiment_name, group.name, x_pos, y_pos, energy_col, "Energy")
+                        group.name, x_pos, y_pos, energy_col, "Energy")
                     y_pos += energy_panel["gridPos"]["h"]
 
                     # Energy Test Panel
@@ -50,7 +50,7 @@ class Statistics:
                     # Power Panel
                     power_col = "CPU_Peak_Power (W)"
                     power_panel = Statistics._create_combined_stat_panel(
-                        experiment_name, group.name, x_pos, y_pos, power_col, "Peak Power")
+                        group.name, x_pos, y_pos, power_col, "Peak Power")
                     y_pos += power_panel["gridPos"]["h"]
 
                     # Power Test Panel
@@ -79,7 +79,7 @@ class Statistics:
                         energy_img = f"CORE{core_num}_Total_Energy_(J)_violin.png"
 
                         energy_panel = Statistics._create_combined_stat_panel(
-                            experiment_name, group.name, x_pos, y_pos, energy_col, f"{core_label} Energy")
+                            group.name, x_pos, y_pos, energy_col, f"{core_label} Energy")
                         y_pos += energy_panel["gridPos"]["h"]
 
                         energy_test_panel = Statistics._create_test_stat_panel(
@@ -95,7 +95,7 @@ class Statistics:
                         power_img = f"CORE{core_num}_Peak_Power_(W)_violin.png"
 
                         power_panel = Statistics._create_combined_stat_panel(
-                            experiment_name, group.name, x_pos, y_pos, power_col, f"{core_label} Peak Power")
+                            group.name, x_pos, y_pos, power_col, f"{core_label} Peak Power")
                         y_pos += power_panel["gridPos"]["h"]
 
                         power_test_panel = Statistics._create_test_stat_panel(
@@ -125,7 +125,7 @@ class Statistics:
             return json.loads(template)
 
     @staticmethod
-    def _create_combined_stat_panel(experiment_name: str, group_name: str, x_pos: int, y_pos: int,
+    def _create_combined_stat_panel(group_name: str, x_pos: int, y_pos: int,
                                      base_column: str, title_suffix: str) -> Dict[str, Any]:
         """
         Creates a single Grafana stat panel showing all statistics for a given base column (e.g., energy or power).
@@ -192,6 +192,7 @@ class Statistics:
 
         return panel
 
+    @staticmethod
     def _create_image_panel(group_name: str, x_pos: int, y_pos: int, image_filename: str, title_suffix: str) -> Dict[
         str, Any]:
         """

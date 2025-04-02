@@ -1,5 +1,7 @@
 import re
 from enum import Enum
+from typing import List, Set
+from models.types.experiment_type import ExperimentType
 
 
 class MeasurementType(Enum):
@@ -9,66 +11,98 @@ class MeasurementType(Enum):
     Each measurement type has an associated column_name that specifies the column in the CSV file.
     Some column names include placeholders (e.g., {core_num}) that should be replaced
     with appropriate values when accessing the actual columns.
+    
+    The third parameter in each enum member defines the compatible experiment types.
     """
-    ALL = (0, "all")
+    ALL = (0, "all", {ExperimentType.PLOT_OVER_TIME, ExperimentType.SIGNIFICANCE_TEST, ExperimentType.STATISTICS})
     
     # Time-related measurements
-    TIME = (1, "Time")
-    DELTA = (2, "Delta")
+    TIME = (1, "Time", {ExperimentType.PLOT_OVER_TIME})
+    DELTA = (2, "Delta", {ExperimentType.PLOT_OVER_TIME})
     
     # System-level measurements
-    #SYSTEM_ENERGY = (10, "SYSTEM_ENERGY")
-    #SYSTEM_POWER = (11, "SYSTEM_POWER")
+    #SYSTEM_ENERGY = (10, "SYSTEM_ENERGY", {ExperimentType.PLOT_OVER_TIME})
+    #SYSTEM_POWER = (11, "SYSTEM_POWER", {ExperimentType.PLOT_OVER_TIME})
     
     # CPU-level aggregated measurements
-    #CPU_ENERGY = (20, "CPU_ENERGY (J)")
-    CPU_POWER = (21, "CPU_POWER (W)", "watt")
+    #CPU_ENERGY = (20, "CPU_ENERGY (J)", {ExperimentType.PLOT_OVER_TIME})
+    CPU_POWER = (21, "CPU_POWER (W)", "watt", {ExperimentType.PLOT_OVER_TIME})
     
     # Per-core energy and power measurements
-    #CORE_ENERGY = (30, "CORE{core_num}_ENERGY (J)")
-    CORE_POWER = (31, "CORE{core_num}_POWER (W)", "watt")
+    #CORE_ENERGY = (30, "CORE{core_num}_ENERGY (J)", {ExperimentType.PLOT_OVER_TIME})
+    CORE_POWER = (31, "CORE{core_num}_POWER (W)", "watt", {ExperimentType.PLOT_OVER_TIME})
     
     # Per-core frequency, voltage, and p-state measurements
-    CORE_FREQUENCY = (40, "CORE{core_num}_FREQ (MHZ)", "rotmhz")
-    CORE_VOLTAGE = (41, "CORE{core_num}_VOLT (V)", "volt")
-    CORE_PSTATE = (42, "CORE{core_num}_PSTATE")
+    CORE_FREQUENCY = (40, "CORE{core_num}_FREQ (MHZ)", "rotmhz", {ExperimentType.PLOT_OVER_TIME})
+    CORE_VOLTAGE = (41, "CORE{core_num}_VOLT (V)", "volt", {ExperimentType.PLOT_OVER_TIME})
+    CORE_PSTATE = (42, "CORE{core_num}_PSTATE", None, {ExperimentType.PLOT_OVER_TIME})
     
     # CPU usage and frequency per logical processor
-    CPU_FREQUENCY_LOGICAL = (50, "CPU_FREQUENCY_{core_num}", "rotmhz")
-    CPU_USAGE_LOGICAL = (51, "CPU_USAGE_{core_num}", "percent")
+    CPU_FREQUENCY_LOGICAL = (50, "CPU_FREQUENCY_{core_num}", "rotmhz", {ExperimentType.PLOT_OVER_TIME})
+    CPU_USAGE_LOGICAL = (51, "CPU_USAGE_{core_num}", "percent", {ExperimentType.PLOT_OVER_TIME})
     
     # Memory metrics
-    # TOTAL_MEMORY = (60, "TOTAL_MEMORY") Seems to be the same value for all rows
-    USED_MEMORY = (61, "USED_MEMORY", "decbytes")
-    TOTAL_SWAP = (62, "TOTAL_SWAP", "decbytes")
-    USED_SWAP = (63, "USED_SWAP", "decbytes")
+    # TOTAL_MEMORY = (60, "TOTAL_MEMORY", {ExperimentType.PLOT_OVER_TIME}) Seems to be the same value for all rows
+    USED_MEMORY = (61, "USED_MEMORY", "decbytes", {ExperimentType.PLOT_OVER_TIME})
+    TOTAL_SWAP = (62, "TOTAL_SWAP", "decbytes", {ExperimentType.PLOT_OVER_TIME})
+    USED_SWAP = (63, "USED_SWAP", "decbytes", {ExperimentType.PLOT_OVER_TIME})
 
-    CPU_STATS = (70, "CPU STATS", "")
-    CORE_STATS = (71, "CORE_STATS", "")
+    # Special statistics types - only compatible with STATISTICS experiment type
+    CPU_STATS = (70, "CPU STATS", "", {ExperimentType.STATISTICS})
+    CORE_STATS = (71, "CORE_STATS", "", {ExperimentType.STATISTICS})
     
     # Temperature metrics
-    #TEMPERATURE = (70, "TEMPERATURE", "celsius")
+    #TEMPERATURE = (70, "TEMPERATURE", "celsius", {ExperimentType.PLOT_OVER_TIME})
     
     # GPU metrics
-    #GPU_METRICS = (80, "GPU_METRICS")
+    #GPU_METRICS = (80, "GPU_METRICS", {ExperimentType.PLOT_OVER_TIME})
 
-    def __init__(self, value, column_name, unit=None):
+    def __init__(self, value, column_name, unit=None, compatible_experiment_types=None):
         """
-        Initialize the enum with a value and column name.
+        Initialize the enum with a value, column name, unit, and compatible experiment types.
         
         Args:
             value: The enum value
             column_name: The corresponding column name in CSV files (may include placeholders)
+            unit: The unit of measurement (for display in visualizations)
+            compatible_experiment_types: Set of ExperimentType values this measurement is compatible with
         """
         self._value_ = value
         self.column_name = column_name
         self.unit = unit
+        # Default to all experiment types if not specified
+        self.compatible_experiment_types = compatible_experiment_types or set()
 
     def __str__(self):
         """
         String representation of the measurement type.
         """
         return self.name
+    
+    def is_compatible_with(self, experiment_type: ExperimentType) -> bool:
+        """
+        Check if this measurement type is compatible with the given experiment type.
+        
+        Args:
+            experiment_type: The experiment type to check compatibility with
+            
+        Returns:
+            bool: True if compatible, False otherwise
+        """
+        return experiment_type in self.compatible_experiment_types
+        
+    @classmethod
+    def get_compatible_types(cls, experiment_type: ExperimentType) -> List['MeasurementType']:
+        """
+        Get all measurement types compatible with the given experiment type.
+        
+        Args:
+            experiment_type: The experiment type to filter by
+            
+        Returns:
+            List[MeasurementType]: List of compatible measurement types
+        """
+        return [mt for mt in cls if mt.is_compatible_with(experiment_type)]
         
     @classmethod
     def _missing_(cls, value):

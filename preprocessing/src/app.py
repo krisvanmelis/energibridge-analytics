@@ -152,33 +152,44 @@ def get_folder_paths() -> Response:
     return jsonify({'folders': [f for f in os.listdir('csv-data/input') if os.path.isdir(os.path.join('csv-data/input', f))]})
 
 
-@app.route('/measurement-types')
-def get_measurement_types() -> Response:
+@app.route('/measurement-types', methods=['GET'])
+def get_measurement_types():
     """
-    Endpoint to get all measurement types defined in the system.
-
-    :return: JSON response with measurement types
+    Get available measurement types for experiments, filtered by experiment type if provided.
     """
-    measurement_types = []
-    
     try:
-        # Debug available measurement types
-        app.logger.debug(f"Available MeasurementType enum values: {[mt.name for mt in MeasurementType]}")
-        app.logger.debug(f"Available MeasurementType enum values with IDs: {[(mt.name, mt.value) for mt in MeasurementType]}")
+        # Check if an experiment type filter was provided
+        experiment_type_id = request.args.get('experiment_type')
         
-        for mt in MeasurementType:
-            # Skip special types like ALL and others that shouldn't be displayed
-            if mt.name not in ['ALL', 'TIME', 'DELTA']:  # Exclude specific types as needed
-                measurement_types.append({
-                    'id': mt.value,
-                    'name': mt.name.replace('_', ' '),
-                    'column_name': mt.column_name if hasattr(mt, 'column_name') else mt.name
-                })
+        # Convert measurement types to a list of dictionaries for the frontend
+        if experiment_type_id:
+            # Filter measurement types by experiment type
+            try:
+                experiment_type = ExperimentType(int(experiment_type_id))
+                measurement_types = MeasurementType.get_compatible_types(experiment_type)
+            except (ValueError, TypeError):
+                # If the experiment_type_id is invalid, return all measurement types
+                measurement_types = list(MeasurementType)
+        else:
+            # No filter, return all measurement types
+            measurement_types = list(MeasurementType)
         
-        return jsonify({'status': 'success', 'measurement_types': measurement_types})
+        # Skip the "ALL" type for the frontend
+        measurement_types = [mt for mt in measurement_types if mt != MeasurementType.ALL]
+        
+        # Convert to JSON-serializable format
+        types_json = [{"id": mt.value, "name": mt.name} for mt in measurement_types]
+        
+        return jsonify({
+            "status": "success",
+            "measurement_types": types_json
+        })
     except Exception as e:
-        app.logger.error(f"Error getting measurement types: {str(e)}", exc_info=True)
-        return jsonify({'status': 'error', 'message': f"Failed to get measurement types: {str(e)}"})
+        app.logger.error(f"Error getting measurement types: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": f"Error getting measurement types: {str(e)}"
+        })
 
 
 def main() -> None:

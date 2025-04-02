@@ -20,7 +20,7 @@
     "graphTooltip": 1,
     "id": 1,
     "links": [],
-    "panels": PLACEHOLDER_PANELS,
+    "panels": [],
     "preload": true,
     "refresh": "5s",
     "schemaVersion": 40,

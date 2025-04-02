@@ -91,8 +91,57 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.status === 'success') {
                     showError('Success', 'Visualizations generated successfully!', null, 'success');
-                    // Open Grafana dashboard in new tab
-                    window.open('http://localhost:3000', '_blank');
+                    
+                    // Create dashboard links
+                    if (response.dashboards && response.dashboards.length > 0) {
+                        const dashboardLinks = $('<div class="dashboard-links"></div>');
+                        const dashboardTitle = $('<h3>Available Dashboards:</h3>');
+                        
+                        const linkList = $('<ul></ul>');
+                        response.dashboards.forEach(dashboard => {
+                            const listItem = $('<li></li>');
+                            const link = $('<a></a>')
+                                .attr('href', dashboard.url)
+                                .attr('target', '_blank')
+                                .text(dashboard.name);
+                            
+                            listItem.append(link);
+                            linkList.append(listItem);
+                        });
+                        
+                        dashboardLinks.append(dashboardTitle, linkList);
+                        
+                        // Show dashboard links in a modal
+                        const linkContainer = $('#dashboard-links-container');
+                        if (linkContainer.length) {
+                            linkContainer.html('').append(dashboardLinks);
+                        } else {
+                            // Create a modal if container doesn't exist
+                            const modal = $('<div id="dashboard-links-modal" class="modal"></div>');
+                            const modalContent = $('<div class="modal-content"></div>');
+                            const closeBtn = $('<span class="close">&times;</span>');
+                            
+                            closeBtn.click(function() {
+                                modal.css('display', 'none');
+                            });
+                            
+                            modalContent.append(closeBtn, dashboardLinks);
+                            modal.append(modalContent);
+                            $('body').append(modal);
+                            
+                            modal.css('display', 'block');
+                            
+                            // Close when clicking outside
+                            $(window).click(function(event) {
+                                if (event.target === modal[0]) {
+                                    modal.css('display', 'none');
+                                }
+                            });
+                        }
+                    } else {
+                        // If no dashboards, open Grafana home
+                        window.open('http://localhost:3000', '_blank');
+                    }
                 } else {
                     showError('Error', 'Error generating visualizations: ' + response.message);
                 }
@@ -106,6 +155,11 @@ $(document).ready(function() {
                 );
             }
         });
+    });
+
+    // Update measurement types when experiment type changes
+    $('#experiment-type').change(function() {
+        loadMeasurementTypes();
     });
 });
 
@@ -309,8 +363,11 @@ function syncExperiments() {
  * Load measurement types from backend and generate checkboxes
  */
 function loadMeasurementTypes() {
+    // Get the currently selected experiment type
+    const experimentType = $('#experiment-type').val();
+    
     $.ajax({
-        url: '/measurement-types',
+        url: `/measurement-types?experiment_type=${experimentType}`,
         method: 'GET',
         success: function(response) {
             if (response.status === 'success') {
