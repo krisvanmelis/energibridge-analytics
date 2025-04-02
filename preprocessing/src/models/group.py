@@ -170,8 +170,8 @@ class Group:
             os.makedirs(folder_path, exist_ok=True)  # Ensure the folder exists
 
             # Create safe filename and full path
-            safe_column = column.replace(' ', '_')
-            output_path = os.path.join(folder_path, f"{safe_column}_violin.png")
+            # safe_column = column.replace(' ', '_')
+            output_path = os.path.join(folder_path, f"{column}_violin.png")
 
             # Save the plot
             plt.savefig(output_path)

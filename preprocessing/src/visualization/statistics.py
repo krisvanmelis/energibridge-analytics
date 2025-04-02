@@ -25,96 +25,55 @@ class Statistics:
         :return: List of panel configurations
         """
         panels = []
+        metrics = ["CPU_Total_Energy (J)", "CPU_Peak_Power (W)"]
 
         for measurement_type in measurement_types:
             if measurement_type == MeasurementType.CPU_STATS:
                 for group in groups:
                     x_pos = 0
+                    for col in metrics:
+                        title = col.replace("CPU_", "").replace(" (J)", "").replace(" (W)", "").replace("_", " ")
 
-                    # Energy Panel
-                    energy_col = "CPU_Total_Energy (J)"
-                    energy_panel = Statistics._create_combined_stat_panel(
-                        group.name, x_pos, y_pos, energy_col, "Energy")
-                    y_pos += energy_panel["gridPos"]["h"]
+                        panel = Statistics._create_combined_stat_panel(group.name, x_pos, y_pos, col, title)
+                        y_pos += panel["gridPos"]["h"]
 
-                    # Energy Test Panel
-                    energy_test_panel = Statistics._create_test_stat_panel(
-                        group.name, x_pos, y_pos, energy_col, "Energy")
-                    y_pos += energy_test_panel["gridPos"]["h"]
+                        test_panel = Statistics._create_test_stat_panel(group.name, x_pos, y_pos, col, title)
+                        y_pos += test_panel["gridPos"]["h"]
 
-                    # Energy Image
-                    energy_image_panel = Statistics._create_image_panel(
-                        group.name, x_pos, y_pos, "CPU_Total_Energy_(J)_violin.png", "Energy")
-                    y_pos += energy_image_panel["gridPos"]["h"]
+                        image_filename = col + "_violin.png"
+                        image_panel = Statistics._create_image_panel(group.name, x_pos, y_pos, image_filename, title)
+                        y_pos += image_panel["gridPos"]["h"]
 
-                    # Power Panel
-                    power_col = "CPU_Peak_Power (W)"
-                    power_panel = Statistics._create_combined_stat_panel(
-                        group.name, x_pos, y_pos, power_col, "Peak Power")
-                    y_pos += power_panel["gridPos"]["h"]
-
-                    # Power Test Panel
-                    power_test_panel = Statistics._create_test_stat_panel(
-                        group.name, x_pos, y_pos, power_col, "Peak Power")
-                    y_pos += power_test_panel["gridPos"]["h"]
-
-                    # Power Image
-                    power_image_panel = Statistics._create_image_panel(
-                        group.name, x_pos, y_pos, "CPU_Peak_Power_(W)_violin.png", "Peak Power")
-                    y_pos += power_image_panel["gridPos"]["h"]
-
-                    panels.extend([
-                        energy_panel, energy_test_panel, energy_image_panel,
-                        power_panel, power_test_panel, power_image_panel
-                    ])
+                        panels.extend([panel, test_panel, image_panel])
 
             elif measurement_type == MeasurementType.CORE_STATS:
                 for group in groups:
                     for core_num in range(8):  # assuming 8 cores
                         x_pos = 0
                         core_label = f"CORE {core_num}"
+                        for cpu_col in metrics:
+                            base_name = cpu_col.replace("CPU_", "")
+                            col = f"CORE{core_num}_{base_name}"
+                            title = f"{core_label} {base_name.split(' ')[0].replace('_', ' ')}"
 
-                        # Energy
-                        energy_col = f"CORE{core_num}_Total_Energy (J)"
-                        energy_img = f"CORE{core_num}_Total_Energy_(J)_violin.png"
+                            panel = Statistics._create_combined_stat_panel(group.name, x_pos, y_pos, col, title)
+                            y_pos += panel["gridPos"]["h"]
 
-                        energy_panel = Statistics._create_combined_stat_panel(
-                            group.name, x_pos, y_pos, energy_col, f"{core_label} Energy")
-                        y_pos += energy_panel["gridPos"]["h"]
+                            test_panel = Statistics._create_test_stat_panel(group.name, x_pos, y_pos, col, title)
+                            y_pos += test_panel["gridPos"]["h"]
 
-                        energy_test_panel = Statistics._create_test_stat_panel(
-                            group.name, x_pos, y_pos, energy_col, f"{core_label} Energy")
-                        y_pos += energy_test_panel["gridPos"]["h"]
+                            image_filename = col + "_violin.png"
+                            image_panel = Statistics._create_image_panel(group.name, x_pos, y_pos, image_filename,
+                                                                         title)
+                            y_pos += image_panel["gridPos"]["h"]
 
-                        energy_image_panel = Statistics._create_image_panel(
-                            group.name, x_pos, y_pos, energy_img, f"{core_label} Energy")
-                        y_pos += energy_image_panel["gridPos"]["h"]
-
-                        # Peak Power
-                        power_col = f"CORE{core_num}_Peak_Power (W)"
-                        power_img = f"CORE{core_num}_Peak_Power_(W)_violin.png"
-
-                        power_panel = Statistics._create_combined_stat_panel(
-                            group.name, x_pos, y_pos, power_col, f"{core_label} Peak Power")
-                        y_pos += power_panel["gridPos"]["h"]
-
-                        power_test_panel = Statistics._create_test_stat_panel(
-                            group.name, x_pos, y_pos, power_col, f"{core_label} Peak Power")
-                        y_pos += power_test_panel["gridPos"]["h"]
-
-                        power_image_panel = Statistics._create_image_panel(
-                            group.name, x_pos, y_pos, power_img, f"{core_label} Peak Power")
-                        y_pos += power_image_panel["gridPos"]["h"]
-
-                        panels.extend([
-                            energy_panel, energy_test_panel, energy_image_panel,
-                            power_panel, power_test_panel, power_image_panel
-                        ])
+                            panels.extend([panel, test_panel, image_panel])
 
             else:
                 continue
 
         return panels
+
 
     @staticmethod
     def _load_template_with_placeholders(template_name: str, placeholders: Dict[str, str]) -> Dict[str, Any]:
