@@ -265,60 +265,74 @@ class PlotOverTime:
             if "fieldConfig" not in panel:
                 panel["fieldConfig"] = {"defaults": {}, "overrides": []}
             
-            # Add special field configurations for quartile fields
-            panel["fieldConfig"]["overrides"] = panel["fieldConfig"].get("overrides", [])
-            
-            # Add new override for lower quartile
-            panel["fieldConfig"]["overrides"].append({
-                "matcher": {
-                    "id": "byName",
-                    "options": f"{str(measurement_type)} (Lower Quartile)"
+            # Add special field configurations for quartile fields with fixed overrides
+            measurement_name = str(measurement_type)
+            panel["fieldConfig"]["overrides"] = [
+                {
+                    "matcher": {
+                        "id": "byName",
+                        "options": f"{measurement_name} (Upper Quartile)"
+                    },
+                    "properties": [
+                        {
+                            "id": "custom.fillBelowTo",
+                            "value": f"{measurement_name} (Lower Quartile)"
+                        },
+                        {
+                            "id": "custom.lineStyle",
+                            "value": {
+                                "dash": [3, 3],
+                                "fill": "dash"
+                            }
+                        },
+                        {
+                            "id": "color",
+                            "value": {
+                                "fixedColor": "rgba(77, 112, 255, 0.4)",
+                                "mode": "fixed"
+                            }
+                        }
+                    ]
                 },
-                "properties": [
-                    {
-                        "id": "custom.fillBelowTo",
-                        "value": f"{str(measurement_type)} (Upper Quartile)"
+                {
+                    "matcher": {
+                        "id": "byName",
+                        "options": f"{measurement_name} (Lower Quartile)"
                     },
-                    {
-                        "id": "custom.lineStyle",
-                        "value": {
-                            "fill": "dash",
-                            "dash": [3, 3]
+                    "properties": [
+                        {
+                            "id": "custom.lineStyle",
+                            "value": {
+                                "dash": [3, 3],
+                                "fill": "dash"
+                            }
+                        },
+                        {
+                            "id": "color",
+                            "value": {
+                                "fixedColor": "rgba(77, 112, 255, 0.4)",
+                                "mode": "fixed"
+                            }
+                        },
+                        {
+                            "id": "custom.fillBelowTo",
+                            "value": f"{measurement_name} (Lower Quartile)"
                         }
-                    },
-                    {
-                        "id": "color",
-                        "value": {
-                            "fixedColor": "rgba(77, 112, 255, 0.4)",
-                            "mode": "fixed"
-                        }
-                    }
-                ]
-            })
-            
-            # Add override for upper quartile
-            panel["fieldConfig"]["overrides"].append({
-                "matcher": {
-                    "id": "byName",
-                    "options": f"{str(measurement_type)} (Upper Quartile)"
+                    ]
                 },
-                "properties": [
-                    {
-                        "id": "custom.lineStyle",
-                        "value": {
-                            "fill": "dash",
-                            "dash": [3, 3]
-                        }
+                {
+                    "matcher": {
+                        "id": "byName",
+                        "options": f"{measurement_name} (Median)"
                     },
-                    {
-                        "id": "color",
-                        "value": {
-                            "fixedColor": "rgba(77, 112, 255, 0.4)",
-                            "mode": "fixed"
+                    "properties": [
+                        {
+                            "id": "custom.fillOpacity",
+                            "value": 0
                         }
-                    }
-                ]
-            })
+                    ]
+                }
+            ]
 
         # If this is a logical processor measurement type that needs a core number
         elif measurement_type in [MeasurementType.CPU_FREQUENCY_LOGICAL, MeasurementType.CPU_USAGE_LOGICAL]:
