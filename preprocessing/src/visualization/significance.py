@@ -50,6 +50,18 @@ class SignificanceTest:
                 ))
                 y_pos += 4
                 continue
+            elif measurement_type == MeasurementType.COMPARE_MEMORY_OVER_TIME:
+                panels.append(SignificanceTest.create_plot_over_time_2_groups(
+                    group0.name, group1.name, y_pos, "TOTAL_MEMORY_mean"
+                ))
+                y_pos += 4
+                continue
+            elif measurement_type == MeasurementType.COMPARE_SWAP_OVER_TIME:
+                panels.append(SignificanceTest.create_plot_over_time_2_groups(
+                group0.name, group1.name, y_pos, "USED_SWAP_mean"
+                ))
+                y_pos += 4
+                continue
             else:
                 continue
 
