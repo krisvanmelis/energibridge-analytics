@@ -6,7 +6,7 @@ import pandas as pd
 import os
 import json
 from scipy.stats import ttest_ind, mannwhitneyu
-import time
+
 
 class SignificanceTest:
     """
@@ -45,8 +45,8 @@ class SignificanceTest:
                 base_column = "CPU_Total_Energy (J)"
                 title_suffix = "Total Energy"
             elif measurement_type == MeasurementType.COMPARE_POWER_OVER_TIME:
-                panels.append(SignificanceTest.create_plot_raw_cpu_power(
-                    group0.name, group1.name, y_pos
+                panels.append(SignificanceTest.create_plot_over_time_2_groups(
+                    group0.name, group1.name, y_pos, "CPU_POWER (W)_mean"
                 ))
                 y_pos += 4
                 continue
@@ -130,12 +130,10 @@ class SignificanceTest:
         agg_path0 = f"csv-data/output/{group_name0}/aggregate_data.csv"
         agg_path1 = f"csv-data/output/{group_name1}/aggregate_data.csv"
 
-        columns_to_keep = ["CPU_POWER (W)_mean", "CPU_ENERGY (J)_mean"]
+
         df0 = pd.read_csv(agg_path0)
         df1 = pd.read_csv(agg_path1)
-        df0 = df0[columns_to_keep]
-        columns_to_keep.append("Time")
-        df1 = df1[columns_to_keep]
+        df0 = df0.drop(columns=["Time"])
 
         df0_renamed = df0.rename(columns={col: f"{col}_{group_name0}" for col in df0.columns if col != "Time"})
         df1_renamed = df1.rename(columns={col: f"{col}_{group_name1}" for col in df1.columns if col != "Time"})
@@ -224,7 +222,7 @@ class SignificanceTest:
         return panel
 
     @staticmethod
-    def create_plot_raw_cpu_power(group_name0: str, group_name1: str, y_pos: int) -> Dict[str, Any]:
+    def create_plot_over_time_2_groups(group_name0: str, group_name1: str, y_pos: int, metric_prefix: str) -> Dict[str, Any]:
         output_group = f"{group_name0}_vs_{group_name1}"
 
         panel = SignificanceTest._load_template_with_placeholders("panel_template.json", {
@@ -238,8 +236,8 @@ class SignificanceTest:
 
         panel["targets"][0]["columns"] = [
             {"selector": "Time", "text": "Time", "type": "timestamp_epoch", "format": "unixtimestampms"},
-            {"selector": f"CPU_POWER (W)_mean_{group_name0}", "text": f"CPU Power {group_name0}", "type": "number"},
-            {"selector": f"CPU_POWER (W)_mean_{group_name1}", "text": f"CPU Power {group_name1}", "type": "number"}
+            {"selector": f"{metric_prefix}_{group_name0}", "text": f"CPU Power {group_name0}", "type": "number"},
+            {"selector": f"{metric_prefix}_{group_name1}", "text": f"CPU Power {group_name1}", "type": "number"}
         ]
         panel["targets"][0]["url"] = f"http://nginx/csv-data/output/{output_group}/aggregate_summary.csv"
         panel["targets"][0]["source"] = "url"
