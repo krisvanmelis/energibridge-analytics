@@ -50,6 +50,11 @@ class MeasurementType(Enum):
     # Special statistics types - only compatible with STATISTICS experiment type
     CPU_STATS = (70, "CPU STATS", "", {ExperimentType.STATISTICS})
     CORE_STATS = (71, "CORE_STATS", "", {ExperimentType.STATISTICS})
+
+    COMPARE_TOTAL_ENERGY = (80, "COMPARE_TOTAL_ENERGY", "", {ExperimentType.SIGNIFICANCE_TEST})
+    COMPARE_PEAK_POWER = (81, "COMPARE_PEAK_POWER", "", {ExperimentType.SIGNIFICANCE_TEST})
+    COMPARE_POWER_OVER_TIME = (82, "COMPARE_POWER_OVER_TIME", "", {ExperimentType.SIGNIFICANCE_TEST})
+
     
     # Temperature metrics
     #TEMPERATURE = (70, "TEMPERATURE", "celsius", {ExperimentType.PLOT_OVER_TIME})
