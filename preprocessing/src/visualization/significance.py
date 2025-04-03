@@ -6,6 +6,8 @@ import pandas as pd
 import os
 import json
 from scipy.stats import ttest_ind, mannwhitneyu
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 class SignificanceTest:
@@ -32,6 +34,7 @@ class SignificanceTest:
         group1 = groups[1]
         SignificanceTest.generate_comparison_file(group0.name, group1.name)
         SignificanceTest.generate_aggregate_summary_file(group0.name, group1.name)
+
 
         x_pos = 0
         y_pos = 0
@@ -60,6 +63,18 @@ class SignificanceTest:
                 panels.append(SignificanceTest.create_plot_over_time_2_groups(
                 group0.name, group1.name, y_pos, "USED_SWAP_mean"
                 ))
+                y_pos += 4
+                continue
+            elif measurement_type == MeasurementType.COMPARE_VIOLIN_ENERGY:
+                SignificanceTest.create_comparison_violinplot(group0.name, group1.name,
+                                                              metric_name="CPU_Total_Energy (J)")
+                panels.append(SignificanceTest.create_violin_image_panel(group0.name, group1.name, "CPU_Total_Energy (J)", x_pos, y_pos))
+                y_pos += 4
+                continue
+            elif measurement_type == MeasurementType.COMPARE_VIOLIN_POWER:
+                SignificanceTest.create_comparison_violinplot(group0.name, group1.name,
+                                                              metric_name="CPU_Peak_Power (W)")
+                panels.append(SignificanceTest.create_violin_image_panel(group0.name, group1.name, "CPU_Peak_Power (W)", x_pos, y_pos))
                 y_pos += 4
                 continue
             else:
@@ -258,3 +273,86 @@ class SignificanceTest:
         panel["refresh"] = True
 
         return panel
+
+    @staticmethod
+    def create_comparison_violinplot(group_name0: str, group_name1: str, metric_name: str,
+                                     output_folder: str = "csv-data/output/violin_plots") -> None:
+        """
+        Creates a violin plot comparing the distribution of a specified metric between two groups.
+
+        :param group_name0: Name of the first group
+        :param group_name1: Name of the second group
+        :param metric_name: The column name of the metric to compare (must exist in trial_summary.csv)
+        :param output_folder: Folder to save the violin plot image
+        """
+        path0 = f"csv-data/output/{group_name0}/trial_summary.csv"
+        path1 = f"csv-data/output/{group_name1}/trial_summary.csv"
+
+        if not os.path.exists(path0):
+            raise FileNotFoundError(f"Trial summary not found for group {group_name0} at: {path0}")
+        if not os.path.exists(path1):
+            raise FileNotFoundError(f"Trial summary not found for group {group_name1} at: {path1}")
+
+        df0 = pd.read_csv(path0)
+        df1 = pd.read_csv(path1)
+
+        if metric_name not in df0.columns or metric_name not in df1.columns:
+            raise ValueError(f"Metric '{metric_name}' not found in trial summaries.")
+
+        df0 = df0[[metric_name]].copy()
+        df1 = df1[[metric_name]].copy()
+        df0["Group"] = group_name0
+        df1["Group"] = group_name1
+
+        combined_df = pd.concat([df0, df1], ignore_index=True)
+
+        plt.figure(figsize=(8, 6))
+        sns.violinplot(data=combined_df, x="Group", y=metric_name)
+        plt.title(f"Violin Plot of '{metric_name}' — {group_name0} vs {group_name1}")
+        plt.ylabel(metric_name)
+        plt.xlabel("Group")
+        plt.tight_layout()
+
+        os.makedirs(output_folder, exist_ok=True)
+        safe_metric = metric_name.replace(" ", "_").replace("/", "_")
+        output_path = os.path.join(output_folder, f"{safe_metric}_{group_name0}_vs_{group_name1}_violin.png")
+        plt.savefig(output_path)
+        plt.close()
+
+    @staticmethod
+    def create_violin_image_panel(group_name0: str, group_name1: str, metric_name: str, x_pos: int, y_pos: int) -> \
+    Dict[str, Any]:
+        """
+        Loads and customizes an image panel for a violin plot comparing two groups on a specific metric.
+        Uses the image_panel_template.json file.
+
+        :param group_name0: Name of the first group
+        :param group_name1: Name of the second group
+        :param metric_name: The metric used for the violin plot
+        :param x_pos: Horizontal position in the Grafana grid
+        :param y_pos: Vertical position in the Grafana grid
+        :return: Panel dictionary for Grafana dashboard
+        """
+        with open("csv-data/grafana-templates/image_panel_template.json", "r") as f:
+            template = json.load(f)
+
+        safe_metric = metric_name.replace(" ", "_").replace("/", "_")
+        comparison_group = f"{group_name0}_vs_{group_name1}"
+        image_filename = f"{safe_metric}_{comparison_group}_violin.png"
+        base_url = "http://localhost:8080"
+
+        # Set panel title and position
+        template["title"] = f"{comparison_group} - {metric_name} Violin Plot"
+        template["gridPos"]["x"] = x_pos
+        template["gridPos"]["y"] = y_pos
+
+        # Replace image URLs in elements and root background
+        for element in template["options"].get("elements", []):
+            if "url" in element:
+                element["url"] = f"{base_url}/csv-data/output/violin_plots/{image_filename}"
+
+        root_image = template["options"]["root"]["background"]["image"]
+        root_image["fixed"] = f"{base_url}/csv-data/output/violin_plots/{image_filename}"
+
+        return template
+
