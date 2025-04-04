@@ -37,7 +37,7 @@
       "calcs": [
         "lastNotNull"
       ],
-      "fields": "",
+      "fields": "/.*/",
       "values": false
     },
     "textMode": "auto"
@@ -70,7 +70,7 @@
         "reducers": [
           "last"
         ],
-        "fields": ""
+        "fields": "/.*/"
       }
     }
   ]

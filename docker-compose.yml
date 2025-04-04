@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: analytics
-    volumes:
-      - ./volumes/postgres-data:/var/lib/postgresql/data
-      - ./postgres-init:/docker-entrypoint-initdb.d
-    ports:
-      - "5432:5432"
-
   grafana:
     image: grafana/grafana:latest
     user: "472"  # Grafana runs as user 472 by default
@@ -26,8 +14,6 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     ports:
       - "3000:3000"
-    depends_on:
-      - postgres
 
   nginx:
     image: nginx:latest
@@ -46,8 +32,6 @@ services:
       - ./images:/app/images
     ports:
       - "5000:5000"
-    depends_on:
-      - postgres
     environment:
       FLASK_ENV: development
       FLASK_APP: src.app

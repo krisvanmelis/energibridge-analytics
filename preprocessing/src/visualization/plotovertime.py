@@ -36,8 +36,7 @@ class PlotOverTime:
                     y_pos += 4  # Stat panels are smaller
             
             # Use specialized panel generators based on measurement type
-            elif measurement_type in [MeasurementType.CORE_POWER, MeasurementType.CORE_VOLTAGE, 
-                                    MeasurementType.CORE_FREQUENCY, MeasurementType.CORE_PSTATE]:
+            elif measurement_type in [MeasurementType.CORE_POWER, MeasurementType.CORE_VOLTAGE]:
                 for group in groups:
                     panel = PlotOverTime._create_per_core_panel(
                         measurement_type, group, y_pos)
@@ -335,7 +334,7 @@ class PlotOverTime:
             ]
 
         # If this is a logical processor measurement type that needs a core number
-        elif measurement_type in [MeasurementType.CPU_FREQUENCY_LOGICAL, MeasurementType.CPU_USAGE_LOGICAL]:
+        elif measurement_type in [MeasurementType.CPU_USAGE_LOGICAL]:
             # Create a list of columns for each logical processor
             columns = []
             # Add time column with correct format
