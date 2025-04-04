@@ -214,7 +214,7 @@ class Group:
             if len(values) >= 3:  # Shapiro test requires at least 3 data points
                 stat, p_value = shapiro(values)
                 group_stats[f"{column}_p_value"] = p_value
-                group_stats[f"{column}_normally_distributed"] = 1 if p_value >= 0.05 else 0
+                group_stats[f"{column}_normally_distributed"] = 1 if p_value <= 0.05 else 0
             else:
                 group_stats[f"{column}_p_value"] = None
                 group_stats[f"{column}_normally_distributed"] = None

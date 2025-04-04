@@ -131,7 +131,7 @@ class SignificanceTest:
             else:
                 pval = float("nan")
 
-            significant = 1 if pval >= 0.05 else 0
+            significant = 1 if pval <= 0.05 else 0
 
             comparison_data[f"{base_col}_{group_name0}"] = [val0]
             comparison_data[f"{base_col}_{group_name1}"] = [val1]
@@ -244,7 +244,20 @@ class SignificanceTest:
         panel["targets"][0]["url"] = f"http://nginx/csv-data/output/{output_group}/group_comparison.csv"
         panel["targets"][0]["source"] = "url"
         panel["targets"][0]["type"] = "csv"
-        panel["transformations"] = []
+        panel["transformations"] = [
+            {
+                "id": "convertFieldType",
+                "options": {
+                    "conversions": [
+                        {
+                            "destinationType": "boolean",
+                            "targetField": "SIGNIFICANT?"
+                        }
+                    ],
+                    "fields": {}
+                }
+            }
+        ]
 
         return panel
 
