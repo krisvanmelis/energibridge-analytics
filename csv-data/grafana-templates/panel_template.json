@@ -16,7 +16,7 @@
                 "axisPlacement": "auto",
                 "barAlignment": 0,
                 "drawStyle": "line",
-                "fillOpacity": 10,
+                "fillOpacity": 0,
                 "gradientMode": "none",
                 "hideFrom": {
                     "legend": false,
@@ -54,9 +54,9 @@
         "overrides": []
     },
     "gridPos": {
-        "h": 4,
-        "w": 5,
-        "x": 6,
+        "h": 6,
+        "w": 12,
+        "x": 0,
         "y": 0
     },
     "options": {
@@ -91,7 +91,7 @@
         }
     ],
     "title": "PLACEHOLDER_MEASUREMENTTYPE",
-    "type": "timeseries",
+    "type": "trend",
     "transformations": [
         
     ]

@@ -26,7 +26,9 @@ class PlotOverTime:
             # Skip ALL type as it's too broad for visualization
             if measurement_type == MeasurementType.ALL:
                 continue
-            
+            panels.append(PlotOverTime._create_row_panel(measurement_type.name.replace("_", " "), y_pos))
+            y_pos += 1
+
             # For energy measurements, add stat panels with detailed statistics
             if "ENERGY" in str(measurement_type):
                 for group in groups:
@@ -42,14 +44,24 @@ class PlotOverTime:
                         measurement_type, group, y_pos)
                     if panel:
                         panels.append(panel)
-                        y_pos += 9
+                        y_pos += panel["gridPos"]["h"]
             # For regular measurements
             else:
                 for group in groups:
                     panel = PlotOverTime._create_standard_panel(
                         measurement_type, group.name, y_pos)
                     panels.append(panel)
-                    y_pos += 9
+                    y_pos += panel["gridPos"]["h"]
+
+            # spacing - 2 graphs per line
+            x_pos = 0
+            for panel in panels:
+                # Set the x position for each panel
+                panel["gridPos"]["x"] = x_pos
+                x_pos += panel["gridPos"]["w"]
+                if x_pos >= 24:  # Reset x position if it exceeds the grid width
+                    x_pos = 0
+                    y_pos += panel["gridPos"]["h"]
                     
         return panels
 
@@ -115,7 +127,7 @@ class PlotOverTime:
 
     @staticmethod
     def _create_per_core_panel(measurement_type: MeasurementType, 
-                               group: Group, y_pos: int) -> Dict[str, Any]:
+                               group: Group, y_pos: int, x_pos: int = 0) -> Dict[str, Any]:
         """
         Generate a panel specifically for per-core measurements, showing data for all cores.
         
@@ -136,6 +148,7 @@ class PlotOverTime:
         # Customize panel title and position - removing experiment name
         panel["title"] = f"{group.name} - Per Core {metric_name}"
         panel["gridPos"]["y"] = y_pos
+
         
         # Apply unit to the panel
         if measurement_type.unit:
@@ -388,3 +401,12 @@ class PlotOverTime:
             panel["targets"][0]["type"] = "csv"
         
         return panel
+
+    @staticmethod
+    def _create_row_panel(title: str, y_pos: int, panels: list = []) -> Dict[str, Any]:
+        with open("csv-data/grafana-templates/row_panel_template.json", "r") as f:
+            template = json.load(f)
+        template["title"] = title
+        template["gridPos"]["y"] = y_pos
+        template["panels"] = panels
+        return template
