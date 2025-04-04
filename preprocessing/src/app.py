@@ -139,8 +139,10 @@ def generate_visualizations() -> Response:
     app.logger.info(f'Generating visualizations for experiments: {experiments}')
 
     # Create dashboard using the GrafanaService
-    grafana_service.create_dashboard_from_experiments(experiments)
-
+    try:
+        grafana_service.create_dashboard_from_experiments(experiments)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
     return jsonify({'status': 'success', 'message': 'Visualizations generated successfully!'})
 
 
