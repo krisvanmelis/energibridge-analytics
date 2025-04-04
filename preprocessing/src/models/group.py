@@ -47,11 +47,19 @@ class Group:
         if not os.path.exists(output_folder_path):
             os.makedirs(output_folder_path)
 
-        # preprocess all trials in input folder and save them to output folder
-        self.trials = [Trial(os.path.join(folder_path, file_name), os.path.join(output_folder_path, file_name))
-                        for file_name in os.listdir(folder_path) if file_name.endswith(".csv")]
+        # Process both CSV and TSV files in the input folder
+        self.trials = []
+        for file_name in os.listdir(folder_path):
+            if file_name.endswith(".csv") or file_name.endswith(".tsv"):
+                # For output, always use .csv extension regardless of input format
+                output_file_name = os.path.splitext(file_name)[0] + ".csv"
+                input_path = os.path.join(folder_path, file_name)
+                output_path = os.path.join(output_folder_path, output_file_name)
+                self.trials.append(Trial(input_path, output_path))
+                
         if len(self.trials) == 0:
-            raise FileNotFoundError(f'No trials found in folder: "{folder_path}"')
+            raise FileNotFoundError(f'No CSV or TSV trials found in folder: "{folder_path}"')
+            
         # aggregate and summarize the group
         self.aggregate()
         self.summarize_trials()
