@@ -2,12 +2,7 @@ import pandas as pd
 from typing import List
 import re
 
-# from preprocessing.src.models.types.measurement_type import MeasurementType
-# from preprocessing.src.models.types.visualization_type import VisualizationType
-# import preprocessing.src.preprocessing as pp
-
 from models.types.measurement_type import MeasurementType
-from models.types.visualization_type import VisualizationType
 import preprocessing as pp
 import os
 
@@ -49,8 +44,3 @@ class Trial:
     def no_logical(self) -> int:
         return len(re.findall(r'CPU_USAGE_\d+', ', '.join(self.preprocessed_data.columns)))
 
-    def visualize(self, measurement_types: List[MeasurementType], visualization_type: VisualizationType) -> dict:
-        """
-        Returns the panel as a dictionary for grafana dashboard.
-        """
-        return {}

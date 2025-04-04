@@ -1,27 +1,26 @@
 import re
 import shutil
 from re import match
-
+from scipy.stats import shapiro
 import pandas as pd
 import numpy as np
 from typing import List
 
+import seaborn as sns
+from matplotlib import pyplot as plt
 from numpy.ma.core import outer, argmax
-
-# from preprocessing.src.models.trial import Trial
-# from preprocessing.src.models.types.measurement_type import MeasurementType
-# from preprocessing.src.models.types.visualization_type import VisualizationType
 
 from models.trial import Trial
 from models.types.measurement_type import MeasurementType
-from models.types.visualization_type import VisualizationType
 import os
 
 
 class Group:
     name: str
     trials: List[Trial]
+    input_folder = 'csv-data/input/'  # always this folder
     output_folder = 'csv-data/output/'  # always this folder
+    image_output_folder = 'images/output/'  # always this folder
 
     # Number of cores and logical processors (easier for exporting to Grafana)
     no_cores: int
@@ -35,47 +34,37 @@ class Group:
     summary_path: str
     summary: pd.DataFrame
 
-    def __init__(self, name: str, folder_path: str = '', is_import: bool = False) -> None:
+    def __init__(self, name: str) -> None:
         self.name = name
 
-        if not is_import:
-            if not os.path.exists(folder_path):
-                raise FileNotFoundError(f'Group folder {folder_path} does not exist.')
+        folder_path = os.path.join(self.input_folder, name)
 
-            # check and create output folder for group
-            output_folder_path = os.path.join(self.output_folder, name)
-            if not os.path.exists(output_folder_path):
-                os.makedirs(output_folder_path)
+        if not os.path.exists(folder_path):
+            raise FileNotFoundError(f'Group folder {folder_path} does not exist.')
 
-            # preprocess all trials in input folder and save them to output folder
-            self.trials = [Trial(os.path.join(folder_path, file_name), os.path.join(output_folder_path, file_name))
-                           for file_name in os.listdir(folder_path) if file_name.endswith(".csv")]
-            if len(self.trials) == 0:
-                raise FileNotFoundError(f'No trials found in folder: "{folder_path}"')
-            # aggregate and summarize the group
-            self.aggregate()
-            self.summarize()
-        else:
-            # for importing existing groups from the output folder.
-            group_folder_path = os.path.join(self.output_folder, name)
+        # check and create output folder for group
+        output_folder_path = os.path.join(self.output_folder, name)
+        if not os.path.exists(output_folder_path):
+            os.makedirs(output_folder_path)
 
-            # find all trial csvs in folder, identified by the ending of the filename
-            self.trials = [Trial(preprocessed_path=os.path.join(group_folder_path, f))
-                           for f in os.listdir(group_folder_path)
-                           if f.endswith("_preprocessed.csv")]
-
-            if len(self.trials) == 0:
-                raise FileNotFoundError(f'No trials found in folder: "{group_folder_path}"')
-
-            # Check if the aggregate data and summary statistics are already present, load if yes, create if no.
-            if os.path.join(group_folder_path, 'aggregate_data.csv') in os.listdir(group_folder_path):
-                self.aggregate_data = pd.read_csv(os.path.join(group_folder_path, 'aggregate_data.csv'))
-            else:
-                self.aggregate()
-            if os.path.join(group_folder_path, 'summary.csv') in os.listdir(group_folder_path):
-                self.summary = pd.read_csv(os.path.join(group_folder_path, 'summary.csv'))
-            else:
-                self.summarize()
+        # Process both CSV and TSV files in the input folder
+        self.trials = []
+        for file_name in os.listdir(folder_path):
+            if file_name.endswith(".csv") or file_name.endswith(".tsv"):
+                # For output, always use .csv extension regardless of input format
+                output_file_name = os.path.splitext(file_name)[0] + ".csv"
+                input_path = os.path.join(folder_path, file_name)
+                output_path = os.path.join(output_folder_path, output_file_name)
+                self.trials.append(Trial(input_path, output_path))
+                
+        if len(self.trials) == 0:
+            raise FileNotFoundError(f'No CSV or TSV trials found in folder: "{folder_path}"')
+            
+        # aggregate and summarize the group
+        self.aggregate()
+        self.summarize_trials()
+        self.generate_violin_plot()
+        self.group_summary()
 
         self.no_cores = self.trials[0].no_cores()
         self.no_logical = self.trials[0].no_logical()
@@ -124,38 +113,118 @@ class Group:
         self.aggregate_data_path = os.path.join(os.path.join(self.output_folder, self.name), 'aggregate_data.csv')
         self.aggregate_data.to_csv(self.aggregate_data_path, index=False)
 
-    def summarize(self) -> None:
+    def summarize_trials(self) -> None:
         """
-        Generate summary statistics for the group. - BROKEN, WILL BE FIXED ASAP
-        - Total energy per trial
-        - peak power per trial
-        - average total energy overall
-        - average peak power overall (Row)
-        - TODO: normal tests? (for energy consumption, peak power, etc.)
+        Generate a summary CSV for each trial with:
+        - Total energy used (CPU and CORE0–CORE7)
+        - Peak power (CPU and CORE0–CORE7)
+        Saves a summary CSV file to the trial output folder.
         """
-        summary = pd.DataFrame(columns=['Trial name', 'Total Energy (J)', 'Peak Power (W)', 'Median Power (W)']).set_index('Trial name')
-        for trial in self.trials:
-            row = [
-                trial.preprocessed_data['CPU_ENERGY (J)'].iloc[-1] - trial.preprocessed_data['CPU_ENERGY (J)'].iloc[0],
-                trial.preprocessed_data['CPU_POWER (W)'].max(),
-                trial.preprocessed_data['CPU_POWER (W)'].median()
-                ]
-            summary.loc[trial.filename] = row
-        summary.loc['Mean Overall'] = [
-            summary['Total Energy (J)'].mean(),
-            summary['Peak Power (W)'].mean(),
-            summary['Median Power (W)'].mean()
-        ]
-        summary.loc['Median Overall'] = [
-            summary['Total Energy (J)'].median(),
-            summary['Peak Power (W)'].median(),
-            summary['Median Power (W)'].median()
-        ]
-        self.summary = summary
-        self.summary_path = os.path.join(os.path.join(self.output_folder, self.name), 'summary.csv')
-        self.summary.to_csv(self.summary_path, index=True)
+        summary_data = []
 
-    def visualize(self, measurement_types: List[MeasurementType], visualization_type: VisualizationType) -> dict:
+        for trial in self.trials:
+            data = trial.preprocessed_data
+            trial_summary = {"Trial": trial.filename}
+
+            # Total energy (sum of DIFF_*_ENERGY columns)
+            trial_summary["CPU_Total_Energy (J)"] = data["DIFF_CPU_ENERGY (J)"].sum()
+            trial_summary["CPU_Peak_Power (W)"] = data["CPU_POWER (W)"].max()
+
+            for core in range(8):
+                energy_col = f"DIFF_CORE{core}_ENERGY (J)"
+                power_col = f"CORE{core}_POWER (W)"
+
+                if energy_col in data.columns and power_col in data.columns:
+                    trial_summary[f"CORE{core}_Total_Energy (J)"] = data[energy_col].sum()
+                    trial_summary[f"CORE{core}_Peak_Power (W)"] = data[power_col].max()
+                else:
+                    trial_summary[f"CORE{core}_Total_Energy (J)"] = None
+                    trial_summary[f"CORE{core}_Peak_Power (W)"] = None
+
+            summary_data.append(trial_summary)
+
+        summary_df = pd.DataFrame(summary_data)
+
+        # Save to CSV
+        summary_path = os.path.join(os.path.join(self.output_folder, self.name), 'trial_summary.csv')
+        summary_df.to_csv(summary_path, index=False)
+
+    def generate_violin_plot(self) -> None:
+        """
+        Generates violin plots of all numeric stats in the summary file
+        and saves them as PNG images in self.image_output_folder.
+        """
+        # Load summary CSV
+        summary_path = os.path.join(self.output_folder, self.name, 'trial_summary.csv')
+        if not os.path.exists(summary_path):
+            raise FileNotFoundError(f"Summary file not found at: {summary_path}")
+
+        df = pd.read_csv(summary_path)
+
+        # Make sure output folder exists
+        os.makedirs(self.image_output_folder, exist_ok=True)
+
+        # Remove non-numeric or identifier columns
+        plot_df = df.drop(columns=["Trial"], errors="ignore")
+
+        # For each stat, create a violin plot across all trials
+        for column in plot_df.columns:
+            plt.figure(figsize=(8, 6))
+            sns.violinplot(data=df, y=column)
+            plt.title(f"Violin Plot: {column}")
+            plt.ylabel(column)
+            plt.tight_layout()
+            folder_path = os.path.join(self.image_output_folder, self.name)
+            os.makedirs(folder_path, exist_ok=True)  # Ensure the folder exists
+
+            # Create safe filename and full path
+            # safe_column = column.replace(' ', '_')
+            output_path = os.path.join(folder_path, f"{column}_violin.png")
+
+            # Save the plot
+            plt.savefig(output_path)
+            plt.close()
+
+    def group_summary(self) -> None:
+        """
+        Generate a group summary CSV file with statistics (mean, std, median, min, max, LQ, UQ)
+        computed across all trials for each metric in trial_summary.csv.
+        """
+        # Load the trial_summary.csv
+        summary_path = os.path.join(self.output_folder, self.name, 'trial_summary.csv')
+        trial_summary_df = pd.read_csv(summary_path)
+
+        # Transpose trial data for easier multi-trial stat calculations
+        trial_summary_df.set_index("Trial", inplace=True)
+        trial_summary_df = trial_summary_df.transpose()
+
+        # Initialize result dictionary
+        group_stats = {}
+
+        for column in trial_summary_df.index:
+            values = trial_summary_df.loc[column].dropna()  # Drop missing values for stat computation
+            group_stats[f"{column}_mean"] = values.mean()
+            group_stats[f"{column}_std"] = values.std()
+            group_stats[f"{column}_median"] = values.median()
+            group_stats[f"{column}_min"] = values.min()
+            group_stats[f"{column}_max"] = values.max()
+            group_stats[f"{column}_LQ"] = values.quantile(0.25)
+            group_stats[f"{column}_UQ"] = values.quantile(0.75)
+
+            if len(values) >= 3:  # Shapiro test requires at least 3 data points
+                stat, p_value = shapiro(values)
+                group_stats[f"{column}_p_value"] = p_value
+                group_stats[f"{column}_normally_distributed"] = 1 if p_value >= 0.05 else 0
+            else:
+                group_stats[f"{column}_p_value"] = None
+                group_stats[f"{column}_normally_distributed"] = None
+
+        # Convert to DataFrame and transpose for CSV output
+        group_summary_df = pd.DataFrame(group_stats, index=[0])
+        group_summary_path = os.path.join(self.output_folder, self.name, 'group_summary.csv')
+        group_summary_df.to_csv(group_summary_path, index=False)
+
+    def visualize(self, measurement_types: List[MeasurementType]) -> dict:
         """
         Returns the panel as a dictionary for grafana dashboard.
         """
@@ -163,10 +232,6 @@ class Group:
         # Aggregate data
         self.aggregate(measurement_types)
 
-        # Summarize data
-        self.summarize(measurement_types)
-
-        # TODO: Add logic to visualize the group data to a panel
 
     def print(self) -> None:
         print(f"Group: {self.name}")
@@ -184,10 +249,3 @@ class Group:
         Convert group to dictionary parseable by frontend.
         """
         return {'name': self.name, 'trial_count': str(len(self.trials))}
-
-    def delete_data_from_disk(self):
-        """
-        Delete processed data from disk.
-        """
-        group_path = os.path.join(self.output_folder, self.name)
-        shutil.rmtree(group_path)

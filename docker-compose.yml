@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-#  postgres:
-#    image: postgres:13
-#    environment:
-#      POSTGRES_USER: admin
-#      POSTGRES_PASSWORD: admin
-#      POSTGRES_DB: analytics
-#    volumes:
-#      - ./volumes/postgres-data:/var/lib/postgresql/data
-#      - ./postgres-init:/docker-entrypoint-initdb.d
-#    ports:
-#      - "5432:5432"
-
   grafana:
     image: grafana/grafana:latest
     user: "472"  # Grafana runs as user 472 by default
@@ -26,29 +14,40 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     ports:
       - "3000:3000"
-#    depends_on:
-#      - postgres
 
   nginx:
     image: nginx:latest
     volumes:
       - ./csv-data:/usr/share/nginx/html/csv-data:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./images:/usr/share/nginx/html/images:ro
     ports:
       - "8080:80"
 
   flask:
     build: ./preprocessing
     volumes:
-      - ./preprocessing:/app
       - ./csv-data:/app/csv-data
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/dashboards:/app/grafana/dashboards
+      - ./images:/app/images
     ports:
-      - "5001:5001"
+      - "5000:5000"
     environment:
-      - FLASK_ENV=development
-      - PYTHONUNBUFFERED=1  # Ensures output appears in real-time in the logs
-
+      FLASK_ENV: development
+      FLASK_APP: src.app
+      PYTHONUNBUFFERED: 1
+      FLASK_DEBUG: 1
+    command: flask run --host=0.0.0.0
+    develop:
+      watch:
+        - action: sync
+          path: ./preprocessing/src
+          target: /app/src
+          ignore:
+            - __pycache__/
+        - action: rebuild
+          path: ./preprocessing/requirements.txt
+          
 volumes:
   postgres-data:
   grafana-data:

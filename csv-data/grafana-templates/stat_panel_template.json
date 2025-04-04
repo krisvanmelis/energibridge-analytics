@@ -1,0 +1,77 @@
+{
+  "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "PEB6B42F54C42D283"
+  },
+  "fieldConfig": {
+    "defaults": {
+      "color": {
+        "mode": "thresholds"
+      },
+      "mappings": [],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {
+            "color": "green",
+            "value": null
+          }
+        ]
+      },
+      "unit": "PLACEHOLDER_UNIT"
+    },
+    "overrides": []
+  },
+  "gridPos": {
+    "h": 4,
+    "w": 4,
+    "x": 0,
+    "y": 0
+  },
+  "options": {
+    "colorMode": "value",
+    "graphMode": "none",
+    "justifyMode": "auto",
+    "orientation": "auto",
+    "reduceOptions": {
+      "calcs": [
+        "lastNotNull"
+      ],
+      "fields": "/.*/",
+      "values": false
+    },
+    "textMode": "auto"
+  },
+  "pluginVersion": "9.5.2",
+  "targets": [
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "PEB6B42F54C42D283"
+      },
+      "format": "table",
+      "parser": "csv",
+      "refId": "A",
+      "source": "url",
+      "type": "csv",
+      "url": "http://nginx/csv-data/output/PLACEHOLDER_GROUPNAME/aggregate_data.csv",
+      "url_options": {
+        "method": "GET"
+      },
+      "columns": []
+    }
+  ],
+  "title": "PLACEHOLDER_TITLE",
+  "type": "stat",
+  "transformations": [
+    {
+      "id": "reduce",
+      "options": {
+        "reducers": [
+          "last"
+        ],
+        "fields": "/.*/"
+      }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "type": "canvas",
+  "title": "PLACEHOLDER_GROUPNAME - CPU PLACEHOLDER_SUFFIX Image",
+  "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 10
+  },
+  "pluginVersion": "11.5.2",
+  "targets": [
+    {
+      "columns": [],
+      "filters": [],
+      "format": "table",
+      "global_query_id": "",
+      "refId": "A",
+      "root_selector": "",
+      "source": "url",
+      "type": "json",
+      "url": "",
+      "url_options": {
+        "data": "",
+        "method": "GET"
+      }
+    }
+  ],
+  "fieldConfig": {
+    "defaults": {
+      "mappings": [],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {
+            "color": "green",
+            "value": null
+          },
+          {
+            "color": "red",
+            "value": 80
+          }
+        ]
+      }
+    },
+    "overrides": []
+  },
+  "options": {
+    "elements": [
+      {
+        "type": "image",
+        "name": "Background",
+        "url": "http://nginx/images/output/PLACEHOLDER_GROUPNAME/PLACEHOLDER_IMAGEFILENAME",
+        "x": 0,
+        "y": 0,
+        "width": 800,
+        "height": 500,
+        "opacity": 1,
+        "rotation": 0,
+        "zIndex": 0
+      }
+    ],
+    "layout": {
+      "displayMode": "absolute"
+    },
+    "root": {
+      "type": "frame",
+      "name": "Root Frame",
+      "background": {
+        "color": {
+          "fixed": "transparent"
+        },
+        "image": {
+          "fixed": "http://localhost:8080/images/output/PLACEHOLDER_GROUPNAME/PLACEHOLDER_IMAGEFILENAME",
+          "mode": "fixed"
+        }
+      },
+      "border": {
+        "color": {
+          "fixed": "dark-green"
+        }
+      },
+      "elements": [],
+      "oneClickMode": "off"
+    },
+    "panZoom": false,
+    "infinitePan": false,
+    "inlineEditing": true,
+    "showAdvancedTypes": true
+  }
+}

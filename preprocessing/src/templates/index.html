@@ -4,126 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Energibridge Visualizations</title>
+    <!-- Add Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Import jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
 </head>
 <body>
     <header>
-        <h1>Energibridge Visualizations</h1>
+        <h1>Energibridge Analytics Dashboard</h1>
     </header>
 
+    <!-- Error card (hidden by default) -->
+    <div id="error-card" class="error-card">
+        <div class="error-header">
+            <h3>Error</h3>
+            <button id="close-error">×</button>
+        </div>
+        <div class="error-content">
+            <p id="error-message"></p>
+            <details>
+                <summary>Technical Details</summary>
+                <pre id="error-details"></pre>
+            </details>
+        </div>
+    </div>
+
     <main>
+        <!-- Experiment configuration section -->
         <section class="form-section">
-            <h2>Experiment Groups</h2>
-            <form id="group-form">
-                <label for="group-name">Name:</label>
-                <input type="text" id="group-name" name="name" required>
-
-                <label for="folder-path">Folder Path:</label>
-                <input type="text" id="folder-path" name="folder_path">
-
-                <button type="submit">Add Experiment Group</button>
-            </form>
-
-            <h2>Visualization Panels</h2>
+            <h2>Configure Experiments</h2>
             <form id="panel-form">
-                <label for="panel-name">Name:</label>
-                <input type="text" id="panel-name" name="name" required>
+                <label for="panel-name">Experiment Name:</label>
+                <input type="text" id="panel-name" name="name" required placeholder="Enter a name for your experiment">
 
-                <label for="groups">Groups:</label>
+                <label for="groups">Select Groups to Include:</label>
                 <div id="groups" class="group-container">
                    <!-- Data filled dynamically -->
                 </div>
 
                 <label for="experiment-type">Experiment Type:</label>
                 <select id="experiment-type" name="experiment_type" required>
-                    <option value="1">Difference</option>
-                    <option value="2">Significance Test</option>
+                    <option value="1">Plot over time</option>
+                    <option value="2">Compare 2 groups</option>
+                    <option value="3">Overall statistics</option>
                 </select>
 
-                <label>Measurement Types:</label>
-                <div class="checkbox-container">
-                    <div class="checkbox-column">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement1" name="measurement_types" value="1">
-                            <label for="measurement1">System Energy</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement2" name="measurement_types" value="2">
-                            <label for="measurement2">System Power</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement3" name="measurement_types" value="3">
-                            <label for="measurement3">CPU Energy</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement4" name="measurement_types" value="4">
-                            <label for="measurement4">CPU Power</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement5" name="measurement_types" value="5">
-                            <label for="measurement5">Power per core (... only)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement6" name="measurement_types" value="6">
-                            <label for="measurement6">Energy per core (... only)</label>
-                        </div>
-                    </div>
-                    <div class="checkbox-column">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement7" name="measurement_types" value="7">
-                            <label for="measurement7">Voltage per core (... only)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement8" name="measurement_types" value="8">
-                            <label for="measurement8">Frequencies (... only)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement9" name="measurement_types" value="9">
-                            <label for="measurement9">Usage per logical processor</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement10" name="measurement_types" value="10">
-                            <label for="measurement10">Memory usages</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement11" name="measurement_types" value="11">
-                            <label for="measurement11">Temperatures</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="measurement12" name="measurement_types" value="12">
-                            <label for="measurement12">GPU metrics (to be added...)</label>
-                        </div>
-                    </div>
+                <label>Select Measurement Types:</label>
+                <div class="checkbox-container" id="measurement-types-container">
+                    <!-- Measurement types will be dynamically inserted here -->
                 </div>
 
-                <button type="submit">Add Visualization Panel</button>
+                <button type="submit">Add Experiment</button>
             </form>
         </section>
 
         <section class="data-section">
-            <h2>Data Overview</h2>
-            <table id="group-table">
-                <thead>
-                    <tr>
-                        <th>Group Name</th>
-                        <th>Trial Count</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Data will be dynamically added here -->
-                </tbody>
-            </table>
-
+            <h2>Configured Experiments</h2>
             <table id="panel-table">
                 <thead>
                     <tr>
-                        <th>Panel Name</th>
+                        <th>Experiment Name</th>
                         <th>Experiment Type</th>
                         <th>Measurement Types</th>
                         <th>Groups</th>
-                        <th></th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -131,7 +79,10 @@
                 </tbody>
             </table>
 
-            <button id="generate-visualizations" onclick="window.location.href='/visualizations/generate'">Generate Visualizations</button>
+            <button id="generate-visualizations">Generate Visualizations</button>
+            
+            <!-- Dashboard links container -->
+            <div id="dashboard-links-container"></div>
         </section>
     </main>
 </body>
