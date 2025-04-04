@@ -30,21 +30,31 @@ class Statistics:
         for measurement_type in measurement_types:
             if measurement_type == MeasurementType.CPU_STATS:
                 for group in groups:
-                    x_pos = 0
+                    image_x_pos = 0
+                    og_y_pos = y_pos
+                    image_panels = []
                     for col in metrics:
+                        x_pos = 0
                         title = col.replace("CPU_", "").replace(" (J)", "").replace(" (W)", "").replace("_", " ")
 
                         panel = Statistics._create_combined_stat_panel(group.name, x_pos, y_pos, col, title)
+                        x_pos += panel["gridPos"]["w"]
+                        test_panel = Statistics._create_test_stat_panel(group.name, x_pos, y_pos, col, title)
+                        x_pos += test_panel["gridPos"]["w"]
                         y_pos += panel["gridPos"]["h"]
 
-                        test_panel = Statistics._create_test_stat_panel(group.name, x_pos, y_pos, col, title)
-                        y_pos += test_panel["gridPos"]["h"]
+                        # test_panel = Statistics._create_test_stat_panel(group.name, x_pos + 6, y_pos, col, title)
+                        # y_pos += test_panel["gridPos"]["h"]
 
                         image_filename = col + "_violin.png"
-                        image_panel = Statistics._create_image_panel(group.name, x_pos, y_pos, image_filename, title)
-                        y_pos += image_panel["gridPos"]["h"]
+                        image_panel = Statistics._create_image_panel(group.name, image_x_pos + x_pos, og_y_pos, image_filename, title)
+                        image_x_pos += image_panel["gridPos"]["w"]
+                        image_panels.append(image_panel)
+                        # y_pos += image_panel["gridPos"]["h"]
 
-                        panels.extend([panel, test_panel, image_panel])
+                        # panels.extend([panel, test_panel, image_panel])
+                        panels.extend([panel, test_panel])
+                    panels.extend(image_panels)
 
             elif measurement_type == MeasurementType.CORE_STATS:
                 for group in groups:
@@ -107,7 +117,6 @@ class Statistics:
             "type": "number"
         } for stat in stats]
 
-
         panel["targets"][0]["columns"] = columns
         panel["targets"][0]["url"] = f"http://nginx/csv-data/output/{group_name}/group_summary.csv"
         panel["targets"][0]["source"] = "url"
@@ -127,8 +136,10 @@ class Statistics:
 
         panel["gridPos"]["x"] = x_pos
         panel["gridPos"]["y"] = y_pos
-        panel["gridPos"]["w"] = 6
+        panel["gridPos"]["w"] = 5
         panel["gridPos"]["h"] = 4
+
+
 
         columns = [
             {
@@ -138,7 +149,7 @@ class Statistics:
             },
             {
                 "selector": f"{base_column}_normally_distributed",
-                "text": "normally distributed?",
+                "text": "Normally distributed?",
                 "type": "number"
             }
         ]
@@ -147,7 +158,20 @@ class Statistics:
         panel["targets"][0]["url"] = f"http://nginx/csv-data/output/{group_name}/group_summary.csv"
         panel["targets"][0]["source"] = "url"
         panel["targets"][0]["type"] = "csv"
-        panel["transformations"] = []
+        panel["transformations"] = [
+            {
+                "id": "convertFieldType",
+                "options": {
+                    "conversions": [
+                        {
+                            "destinationType": "boolean",
+                            "targetField": "Normally distributed?"
+                        }
+                    ],
+                    "fields": {}
+                }
+            }
+        ]
 
         return panel
 
@@ -162,6 +186,8 @@ class Statistics:
 
         # Replace title and positioning
         template["title"] = f"{group_name} - CPU {title_suffix} Image"
+        template["gridPos"]["w"] = 6
+        template["gridPos"]["h"] = 8
         template["gridPos"]["x"] = x_pos
         template["gridPos"]["y"] = y_pos
 
