@@ -55,6 +55,44 @@ Energibridge Analytics is a tool for analyzing and visualizing energy-related pe
 - **Compare 2 groups**: Statistical comparison between two experiment groups with significance testing
 - **Overall statistics**: General statistical analysis of measurements
 
+## Project Structure and Code Organization
+
+### Directory Structure
+```
+energibridge-analytics/
+├── preprocessing/          # Flask application and data processing logic
+│   ├── src/                # Source code for preprocessing and analysis
+│   │   ├── models/         # Data models and type definitions
+│   │   ├── templates/      # Flask HTML templates
+│   │   └── static/         # CSS, JS, and other static assets
+├── csv-data/               # Input and processed CSV files
+│   ├── input/              # Raw measurement data
+│   └── output/             # Processed data and analysis results
+├── grafana/                # Grafana configuration
+│   ├── dashboards/         # Generated dashboard JSON files
+│   └── provisioning/       # Grafana provisioning config
+├── nginx/                  # Nginx configuration for serving CSV files
+└── images/                 # Generated charts and visualizations
+```
+
+### Key Components
+- **Flask App (`preprocessing/src/app.py`)**: Core application handling web interface and API endpoints
+- **Group Service**: Manages experiment groups and their associated data
+- **Experiment Service**: Handles experiment configurations and analysis
+- **Grafana Service**: Generates Grafana dashboard configurations
+- **Measurement Types**: Defines supported metrics (power, energy, temperature, etc.)
+- **Experiment Types**: Defines analysis and visualization approaches
+
+### Development Workflow
+1. Add new measurement data to `csv-data/input/[folder-name]`
+2. Use the web interface to create experiment groups and configurations
+3. Process data and generate visualizations
+4. Access and customize the generated Grafana dashboards
+
+### Extending the Project
+- Add new measurement types in `models/types/measurement_type.py`
+- Create new visualization templates in the Grafana service
+- Implement additional statistical analysis in the experiment service
 
 ## Stopping the Services
 To stop all services, run:
