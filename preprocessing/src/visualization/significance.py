@@ -252,19 +252,22 @@ class SignificanceTest:
     def create_plot_over_time_2_groups(group_name0: str, group_name1: str, y_pos: int, metric_prefix: str) -> Dict[str, Any]:
         output_group = f"{group_name0}_vs_{group_name1}"
 
+        metric_prefix_formatted = metric_prefix.replace("_", " ").title()
+
         panel = SignificanceTest._load_template_with_placeholders("panel_template.json", {
-            "MEASUREMENTTYPE": "CPU_Power_Raw",
+            "MEASUREMENTTYPE": f"CPU_{metric_prefix_formatted}_Raw",
             "GROUPNAME": output_group
         })
 
-        panel["title"] = f"{group_name0} vs {group_name1} - CPU Power Comparison"
+        panel["title"] = f"{group_name0} vs {group_name1} - CPU {metric_prefix_formatted} Comparison"
         panel["gridPos"]["y"] = y_pos
         panel["fieldConfig"]["defaults"]["unit"] = "watt"
 
+
         panel["targets"][0]["columns"] = [
             {"selector": "Time", "text": "Time", "type": "timestamp_epoch", "format": "unixtimestampms"},
-            {"selector": f"{metric_prefix}_{group_name0}", "text": f"CPU Power {group_name0}", "type": "number"},
-            {"selector": f"{metric_prefix}_{group_name1}", "text": f"CPU Power {group_name1}", "type": "number"}
+            {"selector": f"{metric_prefix}_{group_name0}", "text": f"CPU {metric_prefix_formatted} {group_name0}", "type": "number"},
+            {"selector": f"{metric_prefix}_{group_name1}", "text": f"CPU {metric_prefix_formatted} {group_name1}", "type": "number"}
         ]
         panel["targets"][0]["url"] = f"http://nginx/csv-data/output/{output_group}/aggregate_summary.csv"
         panel["targets"][0]["source"] = "url"
