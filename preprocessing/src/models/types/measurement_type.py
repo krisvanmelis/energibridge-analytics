@@ -1,6 +1,6 @@
-import re
 from enum import Enum
-from typing import List, Set
+from typing import List
+
 from models.types.experiment_type import ExperimentType
 
 
@@ -19,26 +19,17 @@ class MeasurementType(Enum):
     # Time-related measurements
     TIME = (1, "Time", {ExperimentType.PLOT_OVER_TIME})
     DELTA = (2, "Delta", {ExperimentType.PLOT_OVER_TIME})
-    
-    # System-level measurements
-    #SYSTEM_ENERGY = (10, "SYSTEM_ENERGY", {ExperimentType.PLOT_OVER_TIME})
-    #SYSTEM_POWER = (11, "SYSTEM_POWER", {ExperimentType.PLOT_OVER_TIME})
-    
+
     # CPU-level aggregated measurements
-    #CPU_ENERGY = (20, "CPU_ENERGY (J)", {ExperimentType.PLOT_OVER_TIME})
     CPU_POWER = (21, "CPU_POWER (W)", "watt", {ExperimentType.PLOT_OVER_TIME})
     
     # Per-core energy and power measurements
-    #CORE_ENERGY = (30, "CORE{core_num}_ENERGY (J)", {ExperimentType.PLOT_OVER_TIME})
     CORE_POWER = (31, "CORE{core_num}_POWER (W)", "watt", {ExperimentType.PLOT_OVER_TIME})
     
     # Per-core frequency, voltage, and p-state measurements
-    CORE_FREQUENCY = (40, "CORE{core_num}_FREQ (MHZ)", "rotmhz", {ExperimentType.PLOT_OVER_TIME})
     CORE_VOLTAGE = (41, "CORE{core_num}_VOLT (V)", "volt", {ExperimentType.PLOT_OVER_TIME})
-    CORE_PSTATE = (42, "CORE{core_num}_PSTATE", None, {ExperimentType.PLOT_OVER_TIME})
     
     # CPU usage and frequency per logical processor
-    CPU_FREQUENCY_LOGICAL = (50, "CPU_FREQUENCY_{core_num}", "rotmhz", {ExperimentType.PLOT_OVER_TIME})
     CPU_USAGE_LOGICAL = (51, "CPU_USAGE_{core_num}", "percent", {ExperimentType.PLOT_OVER_TIME})
     
     # Memory metrics
@@ -56,15 +47,9 @@ class MeasurementType(Enum):
     COMPARE_POWER_OVER_TIME = (82, "COMPARE_POWER_OVER_TIME", "", {ExperimentType.SIGNIFICANCE_TEST})
     COMPARE_MEMORY_OVER_TIME = (83, "COMPARE_MEMORY_OVER_TIME", "", {ExperimentType.SIGNIFICANCE_TEST})
     COMPARE_SWAP_OVER_TIME = (85, "COMPARE_SWAP_OVER_TIME", "", {ExperimentType.SIGNIFICANCE_TEST})
-    COMPARE_VIOLIN_ENERGY = (86,"COMPARE_VIOLIN_ENERGY", "", {ExperimentType.SIGNIFICANCE_TEST})
-    COMPARE_VIOLIN_POWER = (87,"COMPARE_VIOLIN_POWER", "", {ExperimentType.SIGNIFICANCE_TEST})
+    COMPARE_ENERGY_VIOLIN_PLOT = (86, "COMPARE_ENERGY_-_VIOLIN_PLOT", "", {ExperimentType.SIGNIFICANCE_TEST})
+    COMPARE_POWER_VIOLIN_PLOT = (87, "COMPARE_POWER_-_VIOLIN_PLOT", "", {ExperimentType.SIGNIFICANCE_TEST})
 
-    
-    # Temperature metrics
-    #TEMPERATURE = (70, "TEMPERATURE", "celsius", {ExperimentType.PLOT_OVER_TIME})
-    
-    # GPU metrics
-    #GPU_METRICS = (80, "GPU_METRICS", {ExperimentType.PLOT_OVER_TIME})
 
     def __init__(self, value, column_name, unit=None, compatible_experiment_types=None):
         """

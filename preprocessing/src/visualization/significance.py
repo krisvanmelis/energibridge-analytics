@@ -65,13 +65,13 @@ class SignificanceTest:
                 ))
                 y_pos += 4
                 continue
-            elif measurement_type == MeasurementType.COMPARE_VIOLIN_ENERGY:
+            elif measurement_type == MeasurementType.COMPARE_ENERGY_VIOLIN_PLOT:
                 SignificanceTest.create_comparison_violinplot(group0.name, group1.name,
                                                               metric_name="CPU_Total_Energy (J)")
                 panels.append(SignificanceTest.create_violin_image_panel(group0.name, group1.name, "CPU_Total_Energy (J)", x_pos, y_pos))
                 y_pos += 4
                 continue
-            elif measurement_type == MeasurementType.COMPARE_VIOLIN_POWER:
+            elif measurement_type == MeasurementType.COMPARE_POWER_VIOLIN_PLOT:
                 SignificanceTest.create_comparison_violinplot(group0.name, group1.name,
                                                               metric_name="CPU_Peak_Power (W)")
                 panels.append(SignificanceTest.create_violin_image_panel(group0.name, group1.name, "CPU_Peak_Power (W)", x_pos, y_pos))
