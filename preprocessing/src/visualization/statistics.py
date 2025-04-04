@@ -31,59 +31,66 @@ class Statistics:
             if measurement_type == MeasurementType.CPU_STATS:
                 for group in groups:
                     image_x_pos = 0
+                    row_panel = Statistics._create_row_panel(f'{group.name} - {measurement_type.name}', y_pos)
+                    panels.append(row_panel)
+                    y_pos += row_panel["gridPos"]["h"]
                     og_y_pos = y_pos
                     image_panels = []
-                    for col in metrics:
+                    for col in metrics:  # iterate through columns here
                         x_pos = 0
                         title = col.replace("CPU_", "").replace(" (J)", "").replace(" (W)", "").replace("_", " ")
 
                         panel = Statistics._create_combined_stat_panel(group.name, x_pos, y_pos, col, title)
                         x_pos += panel["gridPos"]["w"]
+
                         test_panel = Statistics._create_test_stat_panel(group.name, x_pos, y_pos, col, title)
                         x_pos += test_panel["gridPos"]["w"]
                         y_pos += panel["gridPos"]["h"]
 
-                        # test_panel = Statistics._create_test_stat_panel(group.name, x_pos + 6, y_pos, col, title)
-                        # y_pos += test_panel["gridPos"]["h"]
-
                         image_filename = col + "_violin.png"
-                        image_panel = Statistics._create_image_panel(group.name, image_x_pos + x_pos, og_y_pos, image_filename, title)
+                        image_panel = Statistics._create_image_panel(group.name, image_x_pos + x_pos, og_y_pos,
+                                                                     image_filename, title)
                         image_x_pos += image_panel["gridPos"]["w"]
                         image_panels.append(image_panel)
-                        # y_pos += image_panel["gridPos"]["h"]
-
-                        # panels.extend([panel, test_panel, image_panel])
                         panels.extend([panel, test_panel])
                     panels.extend(image_panels)
 
             elif measurement_type == MeasurementType.CORE_STATS:
                 for group in groups:
-                    for core_num in range(8):  # assuming 8 cores
-                        x_pos = 0
+
+                    for core_num in range(8):  # TODO: currently assuming 8 cores
+                        panels.append(Statistics._create_row_panel(
+                            f'{group.name} - {measurement_type.name} - CORE {core_num}', y_pos))
+                        y_pos += 1
+                        og_y_pos = y_pos
+                        image_x_pos = 0
+                        image_panels = []
+
                         core_label = f"CORE {core_num}"
                         for cpu_col in metrics:
+                            x_pos = 0
                             base_name = cpu_col.replace("CPU_", "")
                             col = f"CORE{core_num}_{base_name}"
                             title = f"{core_label} {base_name.split(' ')[0].replace('_', ' ')}"
 
                             panel = Statistics._create_combined_stat_panel(group.name, x_pos, y_pos, col, title)
-                            y_pos += panel["gridPos"]["h"]
+                            x_pos += panel["gridPos"]["w"]
 
                             test_panel = Statistics._create_test_stat_panel(group.name, x_pos, y_pos, col, title)
-                            y_pos += test_panel["gridPos"]["h"]
+                            x_pos += test_panel["gridPos"]["w"]
+                            y_pos += panel["gridPos"]["h"]
 
                             image_filename = col + "_violin.png"
-                            image_panel = Statistics._create_image_panel(group.name, x_pos, y_pos, image_filename,
-                                                                         title)
-                            y_pos += image_panel["gridPos"]["h"]
+                            image_panel = Statistics._create_image_panel(group.name, image_x_pos + x_pos, og_y_pos,
+                                                                         image_filename, title)
+                            image_x_pos += image_panel["gridPos"]["w"]
 
-                            panels.extend([panel, test_panel, image_panel])
-
+                            panels.extend([panel, test_panel])
+                            image_panels.append(image_panel)
+                        panels.extend(image_panels)
             else:
                 continue
-
         return panels
-
 
     @staticmethod
     def _load_template_with_placeholders(template_name: str, placeholders: Dict[str, str]) -> Dict[str, Any]:
@@ -136,7 +143,7 @@ class Statistics:
 
         panel["gridPos"]["x"] = x_pos
         panel["gridPos"]["y"] = y_pos
-        panel["gridPos"]["w"] = 5
+        panel["gridPos"]["w"] = 6
         panel["gridPos"]["h"] = 4
 
 
@@ -201,4 +208,13 @@ class Statistics:
         root_image["fixed"] = root_image["fixed"].replace("PLACEHOLDER_GROUPNAME", group_name).replace(
             "PLACEHOLDER_IMAGEFILENAME", image_filename)
 
+        return template
+
+    @staticmethod
+    def _create_row_panel(title: str, y_pos: int, panels: list = []) -> Dict[str, Any]:
+        with open("csv-data/grafana-templates/row_panel_template.json", "r") as f:
+            template = json.load(f)
+        template["title"] = title
+        template["gridPos"]["y"] = y_pos
+        template["panels"] = panels
         return template
