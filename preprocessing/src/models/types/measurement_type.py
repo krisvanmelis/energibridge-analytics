@@ -33,9 +33,7 @@ class MeasurementType(Enum):
     CPU_USAGE_LOGICAL = (51, "CPU_USAGE_{core_num}", "percent", {ExperimentType.PLOT_OVER_TIME})
     
     # Memory metrics
-    # TOTAL_MEMORY = (60, "TOTAL_MEMORY", {ExperimentType.PLOT_OVER_TIME}) Seems to be the same value for all rows
     USED_MEMORY = (61, "USED_MEMORY", "decbytes", {ExperimentType.PLOT_OVER_TIME})
-    TOTAL_SWAP = (62, "TOTAL_SWAP", "decbytes", {ExperimentType.PLOT_OVER_TIME})
     USED_SWAP = (63, "USED_SWAP", "decbytes", {ExperimentType.PLOT_OVER_TIME})
 
     # Special statistics types - only compatible with STATISTICS experiment type
