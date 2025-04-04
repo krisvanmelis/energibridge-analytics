@@ -91,7 +91,7 @@
         }
     ],
     "title": "PLACEHOLDER_MEASUREMENTTYPE",
-    "type": "trend",
+    "type": "timeseries",
     "transformations": [
         
     ]
